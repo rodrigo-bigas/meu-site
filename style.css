@@ -61,29 +61,6 @@ header.light-mode .profile p {
     color: #777;
 }
 
-.search-bar input {
-    padding: 12px; /* Aumentei o padding */
-    border: 1px solid #555; /* Adicionei uma borda */
-    border-radius: 8px; /* Bordas mais arredondadas */
-    margin-right: 15px;
-    color: #333;
-    flex-grow: 1;
-    background-color: #444; /* Fundo escuro no modo escuro */
-}
-
-.search-bar input::placeholder {
-    color: #888; /* Cor do placeholder no modo escuro */
-}
-
-header.light-mode .search-bar input {
-    border-color: #bbb;
-    background-color: #fff; /* Fundo claro no modo claro */
-}
-
-header.light-mode .search-bar input::placeholder {
-    color: #aaa;
-}
-
 header button#theme-toggle {
     background-color: transparent;
     color: #eee;
