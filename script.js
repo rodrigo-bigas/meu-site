@@ -29,7 +29,4 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
     }
-
-    // Evento de input para a busca
-    searchInput.addEventListener('input', filterDisciplines);
 });
