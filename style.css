@@ -1,0 +1,186 @@
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; /* Fonte mais elegante */
+    margin: 0;
+    background-color: #222;
+    color: #eee;
+    transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+body.light-mode {
+    background-color: #f4f4f4;
+    color: #333;
+}
+
+header {
+    background-color: #333;
+    color: #eee;
+    padding: 30px 20px; /* Aumentei o padding */
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    border-bottom: 1px solid #555; /* Adicionei uma linha divisória */
+}
+
+header.light-mode {
+    background-color: #ddd;
+    color: #555;
+    border-bottom: 1px solid #bbb;
+}
+
+.profile {
+    display: flex;
+    align-items: center;
+    margin-bottom: 20px; /* Aumentei o espaçamento */
+    flex-basis: 100%;
+}
+
+@media (min-width: 768px) {
+    .profile {
+        flex-basis: auto;
+        margin-bottom: 0;
+    }
+}
+
+.profile img {
+    width: 100px; /* Aumentei um pouco a foto */
+    height: 100px;
+    border-radius: 50%;
+    margin-right: 20px;
+    object-fit: cover;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3); /* Adicionei uma sombra sutil */
+}
+
+.profile p {
+    font-style: italic; /* Deixei a biografia em itálico */
+    color: #ccc; /* Cor um pouco mais clara */
+    line-height: 1.6; /* Melhor espaçamento entre linhas */
+}
+
+header.light-mode .profile p {
+    color: #777;
+}
+
+.search-bar input {
+    padding: 12px; /* Aumentei o padding */
+    border: 1px solid #555; /* Adicionei uma borda */
+    border-radius: 8px; /* Bordas mais arredondadas */
+    margin-right: 15px;
+    color: #333;
+    flex-grow: 1;
+    background-color: #444; /* Fundo escuro no modo escuro */
+}
+
+.search-bar input::placeholder {
+    color: #888; /* Cor do placeholder no modo escuro */
+}
+
+header.light-mode .search-bar input {
+    border-color: #bbb;
+    background-color: #fff; /* Fundo claro no modo claro */
+}
+
+header.light-mode .search-bar input::placeholder {
+    color: #aaa;
+}
+
+header button#theme-toggle {
+    background-color: transparent;
+    color: #eee;
+    border: none;
+    font-size: 1.8em; /* Aumentei o tamanho do ícone */
+    cursor: pointer;
+    transition: color 0.3s ease;
+}
+
+header.light-mode button#theme-toggle {
+    color: #555;
+}
+
+.disciplines {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 30px; /* Aumentei o espaçamento entre os cards */
+    padding: 30px; /* Aumentei o padding da seção */
+}
+
+@media (min-width: 992px) {
+    .disciplines {
+        grid-template-columns: repeat(3, 1fr);
+    }
+}
+
+.card {
+    background-color: #333; /* Tom mais escuro */
+    color: #eee;
+    padding: 25px; /* Aumentei o padding interno */
+    border-radius: 12px; /* Bordas mais arredondadas */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3); /* Sombra mais pronunciada */
+    transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+    border: 1px solid #444; /* Adicionei uma borda sutil */
+}
+
+.card.light-mode {
+    background-color: #fff;
+    color: #444; /* Tom mais escuro no modo claro */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+    border: 1px solid #ddd;
+}
+
+.card:hover {
+    transform: translateY(-8px); /* Efeito de elevação maior */
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.4); /* Sombra mais intensa no hover */
+}
+
+.card.light-mode:hover {
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+}
+
+.card h3 {
+    margin-top: 0;
+    color: #ddd; /* Cor do título */
+    border-bottom: 2px solid #555; /* Linha abaixo do título */
+    padding-bottom: 10px;
+    margin-bottom: 15px;
+}
+
+.card.light-mode h3 {
+    color: #555;
+    border-bottom-color: #bbb;
+}
+
+.card p {
+    margin-bottom: 20px; /* Mais espaçamento abaixo do parágrafo */
+    line-height: 1.7; /* Melhor espaçamento entre linhas */
+    color: #ccc;
+}
+
+.card.light-mode p {
+    color: #777;
+}
+
+.button {
+    display: inline-block;
+    background-color: #5cb85c;
+    color: white;
+    padding: 12px 20px; /* Aumentei o padding do botão */
+    text-decoration: none;
+    border-radius: 8px; /* Bordas mais arredondadas */
+    transition: background-color 0.3s ease;
+    font-weight: bold; /* Texto em negrito */
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2); /* Sombra sutil no botão */
+}
+
+.button:hover {
+    background-color: #4cae4c;
+    box-shadow: 0 3px 6px rgba(0, 0, 0, 0.3); /* Sombra mais intensa no hover */
+}
+
+.card.light-mode .button {
+    background-color: #007bff;
+    color: white;
+}
+
+.card.light-mode .button:hover {
+    background-color: #0056b3;
+}
