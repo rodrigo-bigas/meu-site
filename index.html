@@ -1,49 +1,55 @@
-<!DOCTYPE html>
-<html lang="pt-BR" class="dark-mode">
+<html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Portfólio do Professor</title>
+    <title>Rodrigo - Bigas</title>
     <link rel="stylesheet" href="style.css">
 </head>
-<body>
+<body class="dark-mode">
     <header>
-        <div class="profile">
-            <img src="eu.jpeg" alt="Foto de Perfil">
-            <p>Professor Rodrigo (Bigas) com experiência em diversas áreas da computação, apaixonado por compartilhar conhecimento e explorar novas tecnologias.
-                <br>Venha comigo fazer parte dessa jornada!
-            </p>
+        <div class="profile-section">
+            <img src="eu.jpeg" alt="Foto do Professor" class="profile-pic">
+            <div class="bio">
+                <h1>Professor Rodrigo</h1>
+                <p>Sou o Prof. "Bigas", apaixonado por tecnologia e educação! Atuo no ensino de Informática com foco em Programação, Desenvolvimento Web, Banco de Dados e Aplicativos. Minha missão é tornar o aprendizado prático, criativo e conectado com o mundo real, ajudando estudantes a se prepararem para os desafios do mercado de trabalho e da vida digital. Aqui no site, você encontra materiais, dicas e projetos desenvolvidos nas aulas. Vamos aprender juntos?</p>
+            </div>
         </div>
-        <button id="theme-toggle">☀️<h6 style="font-size: 13px; font-weight: 500;">Altere o tema</h6></button>
+        <div class="header-controls">
+            <button id="theme-toggle" aria-label="Alternar tema">🌙</button>
+        </div>
     </header>
 
-    <main class="disciplines">
-        <div class="card" data-keywords="programação web html css javascript">
-            <h3>Programação Web</h3>
-            <p>Conteúdo sobre HTML, CSS, JavaScript, PHP, Python e frameworks web.</p>
-            <a href="https://drive.google.com/drive/folders/1RmsDP-jxFK0FlkgyAFfwlvXBsXgXrNu_?usp=sharing" target="_blank" class="button">Acessar Conteúdo</a>
-        </div>
+    <div class="main-container">
+        <main class="content-area">
+            <div class="subject-cards-grid">
+                <div class="card" data-title="Programação Web" data-keywords="HTML, CSS, JavaScript, Frontend, Backend, HTTP, API, WebDev">
+                    <h2>Programação Web</h2>
+                    <p>Desenvolvimento de sites e aplicações web modernas e responsivas.</p>
+                    <a href="https://drive.google.com/drive/folders/1RmsDP-jxFK0FlkgyAFfwlvXBsXgXrNu_?usp=sharing" target="_blank" target="_blank" class="btn-link">Acessar Conteúdo</a>
+                </div>
 
-        <div class="card" data-keywords="programação aplicativos mobile android ios">
-            <h3>Programação de Aplicativos</h3>
-            <p>Materiais sobre desenvolvimento para Android, iOS e tecnologias híbridas.</p>
-            <a href="https://drive.google.com/drive/folders/1JGc11_KVPUVrOfPBK4iXUugBQiHHVcqA?usp=sharing" target="_blank" class="button">Acessar Conteúdo</a>
-        </div>
+                <div class="card" data-title="Programação de Aplicativos" data-keywords="Mobile, Android, iOS, Java, Kotlin, Swift, UI, UX, AppDev">
+                    <h2>Programação de Aplicativos</h2>
+                    <p>Criação de aplicativos para dispositivos móveis e outras plataformas.</p>
+                    <a href="https://drive.google.com/drive/folders/1JGc11_KVPUVrOfPBK4iXUugBQiHHVcqA?usp=sharing" target="_blank" target="_blank" class="btn-link">Acessar Conteúdo</a>
+                </div>
 
-        <div class="card" data-keywords="banco de dados sql mysql postgresql">
-            <h3>Banco de Dados</h3>
-            <p>Recursos sobre SQL, modelagem de dados e diferentes sistemas de bancos de dados.</p>
-            <a href="https://drive.google.com/drive/folders/1xnUTy7bv6K6CzLzIg_XcjyAm0J4xtL_t?usp=sharing" target="_blank" class="button">Acessar Conteúdo</a>
-        </div>
+                <div class="card" data-title="Banco de Dados" data-keywords="SQL, NoSQL, Modelagem, Normalização, Consultas, MySQL, PostgreSQL, Dados">
+                    <h2>Banco de Dados</h2>
+                    <p>Gerenciamento e modelagem de dados para sistemas eficientes.</p>
+                    <a href="https://drive.google.com/drive/folders/1xnUTy7bv6K6CzLzIg_XcjyAm0J4xtL_t?usp=sharing" target="_blank" target="_blank" class="btn-link">Acessar Conteúdo</a>
+                </div>
 
-        <div class="card" data-keywords="introdução computação hardware software redes">
-            <h3>Introdução à Computação</h3>
-            <p>Materiais básicos sobre hardware, software, sistemas operacionais e redes de computadores.</p>
-            <a href="https://drive.google.com/drive/folders/1JIAR1KCPNomti8YCBHmd4OhYsVX5xOTn?usp=sharing" target="_blank" class="button">Acessar Conteúdo</a>
-        </div>
-    </main>
+                <div class="card" data-title="Introdução à Computação" data-keywords="Algoritmos, Lógica, Hardware, Software, Sistemas Operacionais, Redes, Fundamentos">
+                    <h2>Introdução à Computação</h2>
+                    <p>Fundamentos da ciência da computação e lógica de programação.</p>
+                    <a href="https://drive.google.com/drive/folders/1JIAR1KCPNomti8YCBHmd4OhYsVX5xOTn?usp=sharing" target="_blank" class="btn-link">Acessar Conteúdo</a>
+                </div>
+            </div>
+        </main>
+    </div>
     <footer>
-        <p style="text-align: center; font-weight:500; font-family:'Times New Roman', Times, serif;">₢ 2025 Professor Rodrigo. Todos os direitos reservados.</p>
+         <p style="text-align: center; font-weight:500; font-family:'Times New Roman', Times, serif;">₢ 2025 Professor Rodrigo. Todos os direitos reservados.</p>
     </footer>
 
     <script src="script.js"></script>
