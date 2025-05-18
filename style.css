@@ -1,163 +1,265 @@
+:root {
+    --font-family: 'Arial', sans-serif;
+    
+    /* Dark Mode (Default) - Updated Colors */
+    --bg-color-dark: #0D1117; /* Very dark, almost black, slightly blue-ish */
+    --card-bg-color-dark: #161B22; /* Dark gray, slightly blue-ish */
+    --text-color-dark: #C9D1D9; /* Light gray for text */
+    --primary-color-dark: #58A6FF; /* Bright blue for accents */
+    --secondary-color-dark: #A371F7; /* Purple for secondary accents */
+    --border-color-dark: #30363D; /* Medium gray for borders */
+    --header-bg-dark: #161B22; /* Same as card background */
+
+    /* Light Mode */
+    --bg-color-light: #f0f2f5;
+    --card-bg-color-light: #ffffff;
+    --text-color-light: #333333;
+    --primary-color-light: #4a90e2;
+    --secondary-color-light: #d0021b;
+    --border-color-light: #d1d1d1;
+    --header-bg-light: #ffffff;
+
+    /* Universal variables (can be overridden by theme) */
+    --bg-color: var(--bg-color-dark);
+    --card-bg-color: var(--card-bg-color-dark);
+    --text-color: var(--text-color-dark);
+    --primary-color: var(--primary-color-dark);
+    --secondary-color: var(--secondary-color-dark);
+    --border-color: var(--border-color-dark);
+    --header-bg: var(--header-bg-dark);
+    --shadow-color: rgba(0,0,0,0.2);
+}
+
 body {
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; /* Fonte mais elegante */
+    font-family: var(--font-family);
     margin: 0;
-    background-color: #222;
-    color: #eee;
+    background-color: var(--bg-color);
+    color: var(--text-color);
     transition: background-color 0.3s ease, color 0.3s ease;
+    line-height: 1.6;
 }
 
 body.light-mode {
-    background-color: #f4f4f4;
-    color: #333;
+    --bg-color: var(--bg-color-light);
+    --card-bg-color: var(--card-bg-color-light);
+    --text-color: var(--text-color-light);
+    --primary-color: var(--primary-color-light);
+    --secondary-color: var(--secondary-color-light);
+    --border-color: var(--border-color-light);
+    --header-bg: var(--header-bg-light);
+    --shadow-color: rgba(0,0,0,0.1);
 }
 
 header {
-    background-color: #333;
-    color: #eee;
-    padding: 30px 20px; /* Aumentei o padding */
+    background-color: var(--header-bg);
+    padding: 20px;
     display: flex;
-    flex-wrap: wrap;
-    align-items: center;
     justify-content: space-between;
-    border-bottom: 1px solid #555; /* Adicionei uma linha divisória */
+    align-items: center;
+    border-bottom: 1px solid var(--border-color);
+    transition: background-color 0.3s ease, border-bottom-color 0.3s ease;
+    box-shadow: 0 2px 4px var(--shadow-color);
 }
 
-header.light-mode {
-    background-color: #ddd;
-    color: #555;
-    border-bottom: 1px solid #bbb;
-}
-
-.profile {
+.profile-section {
     display: flex;
     align-items: center;
-    margin-bottom: 20px; /* Aumentei o espaçamento */
-    flex-basis: 100%;
+    flex-grow: 1; /* Allow profile section to take available space */
 }
 
-@media (min-width: 768px) {
-    .profile {
-        flex-basis: auto;
-        margin-bottom: 0;
-    }
-}
-
-.profile img {
-    width: 100px; /* Aumentei um pouco a foto */
-    height: 100px;
+.profile-pic {
+    width: 80px;
+    height: 80px;
     border-radius: 50%;
-    margin-right: 20px;
     object-fit: cover;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3); /* Adicionei uma sombra sutil */
+    margin-right: 20px;
+    border: 2px solid var(--primary-color);
 }
 
-.profile p {
-    font-style: italic; /* Deixei a biografia em itálico */
-    color: #ccc; /* Cor um pouco mais clara */
-    line-height: 1.6; /* Melhor espaçamento entre linhas */
+.bio {
+    text-align: center; /* Center align the text within the bio */
+    flex-grow: 1; /* Allow bio to take available space next to pic */
 }
 
-header.light-mode .profile p {
-    color: #777;
+.bio h1 {
+    margin-top: 0;
+    margin-bottom: 5px;
+    color: var(--primary-color);
+    font-size: 1.8em;
 }
 
-header button#theme-toggle {
-    background-color: transparent;
-    color: #eee;
-    border: none;
-    font-size: 1.8em; /* Aumentei o tamanho do ícone */
+.bio p {
+    margin-bottom: 0;
+    font-size: 0.9em;
+    max-width: 600px;
+    margin-left: auto; /* For centering block if max-width is hit */
+    margin-right: auto; /* For centering block if max-width is hit */
+}
+
+.header-controls {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end; /* Align toggle to the right */
+    flex-shrink: 0; /* Prevent shrinking if bio text is very long */
+}
+
+#theme-toggle {
+    background: none;
+    border: 1px solid var(--primary-color);
+    color: var(--primary-color);
+    font-size: 1.5em;
     cursor: pointer;
-    transition: color 0.3s ease;
+    padding: 8px 12px;
+    border-radius: 50%;
+    transition: background-color 0.3s, color 0.3s, transform 0.2s;
 }
 
-header.light-mode button#theme-toggle {
-    color: #555;
+#theme-toggle:hover {
+    background-color: var(--primary-color);
+    color: var(--bg-color); /* Use bg-color for hover text to ensure contrast with primary */
+    transform: scale(1.1);
 }
 
-.disciplines {
+.main-container {
+    padding: 20px;
+}
+
+.content-area {
+    flex-grow: 1;
+}
+
+.subject-cards-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-    gap: 30px; /* Aumentei o espaçamento entre os cards */
-    padding: 30px; /* Aumentei o padding da seção */
-}
-
-@media (min-width: 992px) {
-    .disciplines {
-        grid-template-columns: repeat(3, 1fr);
-    }
+    grid-template-columns: repeat(3, 1fr); /* Changed to 3 columns */
+    gap: 20px;
 }
 
 .card {
-    background-color: #333; /* Tom mais escuro */
-    color: #eee;
-    padding: 25px; /* Aumentei o padding interno */
-    border-radius: 12px; /* Bordas mais arredondadas */
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3); /* Sombra mais pronunciada */
-    transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
-    border: 1px solid #444; /* Adicionei uma borda sutil */
-}
-
-.card.light-mode {
-    background-color: #fff;
-    color: #444; /* Tom mais escuro no modo claro */
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
-    border: 1px solid #ddd;
+    background-color: var(--card-bg-color);
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px var(--shadow-color);
+    transition: transform 0.3s ease, box-shadow 0.3s ease, background-color 0.3s ease;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
 }
 
 .card:hover {
-    transform: translateY(-8px); /* Efeito de elevação maior */
-    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.4); /* Sombra mais intensa no hover */
+    transform: translateY(-5px) scale(1.03);
+    box-shadow: 0 8px 16px var(--shadow-color);
 }
 
-.card.light-mode:hover {
-    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
-}
-
-.card h3 {
+.card h2 {
     margin-top: 0;
-    color: #ddd; /* Cor do título */
-    border-bottom: 2px solid #555; /* Linha abaixo do título */
-    padding-bottom: 10px;
-    margin-bottom: 15px;
-}
-
-.card.light-mode h3 {
-    color: #555;
-    border-bottom-color: #bbb;
+    color: var(--primary-color);
+    font-size: 1.5em;
 }
 
 .card p {
-    margin-bottom: 20px; /* Mais espaçamento abaixo do parágrafo */
-    line-height: 1.7; /* Melhor espaçamento entre linhas */
-    color: #ccc;
+    font-size: 0.95em;
+    flex-grow: 1;
+    margin-bottom: 15px;
 }
 
-.card.light-mode p {
-    color: #777;
-}
-
-.button {
+.btn-link {
     display: inline-block;
-    background-color: #5cb85c;
-    color: white;
-    padding: 12px 20px; /* Aumentei o padding do botão */
+    background-color: var(--primary-color);
+    color: var(--bg-color); /* Text color that contrasts well with primary_color */
+    padding: 10px 15px;
     text-decoration: none;
-    border-radius: 8px; /* Bordas mais arredondadas */
-    transition: background-color 0.3s ease;
-    font-weight: bold; /* Texto em negrito */
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2); /* Sombra sutil no botão */
+    border-radius: 5px;
+    text-align: center;
+    font-weight: bold;
+    transition: background-color 0.3s ease, transform 0.2s ease;
 }
 
-.button:hover {
-    background-color: #4cae4c;
-    box-shadow: 0 3px 6px rgba(0, 0, 0, 0.3); /* Sombra mais intensa no hover */
+body.light-mode .btn-link {
+    color: var(--card-bg-color-light); /* Ensure good contrast in light mode */
+}
+body.dark-mode .btn-link {
+    color: #0D1117; /* Text color for buttons in dark mode, ensuring contrast with bright blue */
 }
 
-.card.light-mode .button {
-    background-color: #007bff;
-    color: white;
+.btn-link:hover {
+    background-color: var(--secondary-color);
+    transform: scale(1.05);
 }
 
-.card.light-mode .button:hover {
-    background-color: #0056b3;
+/* Responsive Design */
+@media (max-width: 1024px) {
+    .subject-cards-grid {
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); /* Revert to auto-fit for smaller screens */
+    }
+}
+
+@media (max-width: 768px) {
+    header {
+        flex-direction: column;
+        align-items: center; /* Center items when stacked */
+        gap: 15px; /* Add gap between stacked items */
+    }
+
+    .profile-section {
+        flex-direction: column; /* Stack pic and bio */
+        align-items: center; /* Center pic and bio */
+        width: 100%; /* Take full width to center content */
+        text-align: center; /* Ensure text inside is centered */
+    }
+
+    .profile-pic {
+        margin-right: 0; /* Remove right margin */
+        margin-bottom: 15px; /* Add bottom margin when stacked */
+    }
+    
+    .bio {
+        /* text-align: center; inherited from .profile-section or can be explicit */
+        width: 100%; /* Ensure bio takes width for centering its content */
+    }
+
+    .bio h1 {
+        font-size: 1.5em;
+    }
+    .bio p {
+        font-size: 0.85em;
+        max-width: 90%; /* Allow p to use more width and center nicely */
+        /* margin-left/right: auto; will work due to max-width */
+    }
+
+    .header-controls {
+        width: 100%;
+        justify-content: center; /* Center toggle button */
+    }
+    
+    #theme-toggle {
+        /* position: absolute; top: 20px; right: 20px; removed */
+        font-size: 1.3em; /* Keep existing responsive size */
+    }
+
+    .subject-cards-grid {
+        grid-template-columns: 1fr; /* Single column */
+    }
+}
+
+@media (max-width: 480px) {
+    .bio h1 {
+        font-size: 1.3em;
+    }
+     .bio p {
+        font-size: 0.8em;
+    }
+    .card h2 {
+        font-size: 1.3em;
+    }
+    .card p {
+        font-size: 0.9em;
+    }
+    .btn-link {
+        padding: 8px 12px;
+        font-size: 0.9em;
+    }
+    #theme-toggle {
+        padding: 6px 10px;
+        font-size: 1.2em;
+    }
 }
