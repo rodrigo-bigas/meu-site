@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description"
+        content="Portal educacional do Professor Especialista Rodrigo de Matos. Conteúdos de Informática para Ensino Médio, Técnico e Superior.">
+    <title>Professor Rodrigo de Matos | Portal Educacional</title>
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <!-- CSS -->
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body data-theme="dark">
+    <header class="header">
+        <nav class="nav container">
+            <a href="#" class="logo">Prof. Rodrigo de Matos</a>
+            <div class="nav-controls">
+                <button id="theme-toggle" class="theme-btn" aria-label="Alternar modo escuro">
+                    <i class="fa-solid fa-moon"></i>
+                </button>
+            </div>
+        </nav>
+    </header>
+
+    <main>
+        <!-- Hero Section -->
+        <section class="hero" id="inicio">
+            <div class="container hero-container">
+                <div class="hero-content fade-in">
+                    <span class="badge">Professor Especialista</span>
+                    <h1>Rodrigo de Matos</h1>
+                    <p class="subtitle">Professor de Informática – Ensino Médio, Técnico e Superior</p>
+                    <p class="description">
+                        Este portal foi desenvolvido para facilitar o acesso dos alunos aos materiais das disciplinas
+                        ministradas no CEDUP Renato Ramos da Silva e no IFSC – Campus Lages/SC.
+                        <br><br>
+                        Aqui você encontrará conteúdos organizados, atualizados e voltados à prática, apoiando o
+                        aprendizado em sala de aula e o desenvolvimento das competências tecnológicas.
+                    </p>
+                    <a href="#disciplinas" class="btn btn-primary">Acessar Conteúdos</a>
+                </div>
+                <div class="hero-image fade-in delay-1">
+                    <div class="image-wrapper">
+                        <img src="eu.png" alt="Professor Rodrigo de Matos" class="profile-img">
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Sobre o Professor -->
+        <section class="about section" id="sobre">
+            <div class="container">
+                <div class="section-header fade-in">
+                    <h2>Sobre o Professor</h2>
+                    <div class="divider"></div>
+                </div>
+                <div class="about-content fade-in">
+                    <div class="about-card">
+                        <p>
+                            <strong>Rodrigo de Matos</strong> é Professor Especialista em Informática, com atuação no
+                            Ensino Médio, Técnico e Ensino Superior.
+                        </p>
+                        <p>
+                            Desenvolve suas aulas com foco em metodologias ativas, projetos práticos e uso de
+                            tecnologias atuais, buscando tornar o aprendizado mais acessível, aplicado e conectado à
+                            realidade profissional dos alunos.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Instituições -->
+        <section class="institutions section alt-bg" id="instituicoes">
+            <div class="container">
+                <div class="section-header fade-in">
+                    <h2>Instituições de Ensino</h2>
+                    <p class="section-desc">Os materiais disponibilizados neste portal são utilizados nas aulas
+                        ministradas nas seguintes instituições:</p>
+                    <div class="divider"></div>
+                </div>
+                <div class="institutions-grid">
+                    <div class="institution-card fade-in">
+                        <div class="icon-box">
+                            <i class="fa-solid fa-school"></i>
+                        </div>
+                        <h3>CEDUP</h3>
+                        <p>Renato Ramos da Silva</p>
+                    </div>
+                    <div class="institution-card fade-in delay-1">
+                        <div class="icon-box">
+                            <i class="fa-solid fa-building-columns"></i>
+                        </div>
+                        <h3>IFSC</h3>
+                        <p>Instituto Federal de Santa Catarina – Campus Lages</p>
+                    </div>
+                </div>
+                <p class="text-center mt-2 fade-in">Os conteúdos são organizados por disciplina e nível de ensino,
+                    facilitando o acesso e a compreensão dos alunos.</p>
+            </div>
+        </section>
+
+        <!-- Disciplinas -->
+        <section class="disciplines section" id="disciplinas">
+            <div class="container">
+                <div class="section-header fade-in">
+                    <h2>Disciplinas e Materiais</h2>
+                    <div class="divider"></div>
+                </div>
+                <div class="disciplines-grid">
+                    <!-- Card 1 -->
+                    <div class="discipline-card fade-in">
+                        <div class="card-icon">
+                            <i class="fa-solid fa-code"></i>
+                        </div>
+                        <h3>Desenvolvimento Web</h3>
+                        <p>Conteúdos voltados à criação de páginas e aplicações web, com foco em HTML, CSS e fundamentos
+                            de JavaScript. Inclui exemplos práticos, exercícios e projetos aplicados para diferentes
+                            níveis de ensino.</p>
+                        <a href="#" class="btn btn-outline" target="_blank">
+                            <i class="fa-brands fa-google-drive"></i> Acessar Material
+                        </a>
+                    </div>
+
+                    <!-- Card 2 -->
+                    <div class="discipline-card fade-in delay-1">
+                        <div class="card-icon">
+                            <i class="fa-solid fa-database"></i>
+                        </div>
+                        <h3>Banco de Dados</h3>
+                        <p>Materiais sobre modelagem de dados, linguagem SQL e boas práticas no uso de bancos de dados.
+                            Inclui exercícios práticos, exemplos e atividades voltadas à aplicação real dos conceitos.
+                        </p>
+                        <a href="#" class="btn btn-outline" target="_blank">
+                            <i class="fa-brands fa-google-drive"></i> Acessar Material
+                        </a>
+                    </div>
+
+                    <!-- Card 3 -->
+                    <div class="discipline-card fade-in delay-2">
+                        <div class="card-icon">
+                            <i class="fa-solid fa-language"></i>
+                        </div>
+                        <h3>Língua Inglesa</h3>
+                        <p>Conteúdos de língua inglesa com foco em tecnologia e informática, abordando vocabulário
+                            técnico, leitura e interpretação de textos da área de TI.</p>
+                        <a href="#" class="btn btn-outline" target="_blank">
+                            <i class="fa-brands fa-google-drive"></i> Acessar Material
+                        </a>
+                    </div>
+                </div>
+
+                <div class="drive-info fade-in mt-4">
+                    <div class="info-box">
+                        <i class="fa-solid fa-folder-tree"></i>
+                        <div>
+                            <h4>Organização dos Conteúdos</h4>
+                            <p>Todos os materiais estão organizados em pastas no Google Drive, separadas por disciplina
+                                e nível de ensino (Médio, Técnico e Superior). Os conteúdos são atualizados
+                                periodicamente.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="footer">
+        <div class="container footer-content">
+            <div class="footer-info">
+                <h3>Prof. Rodrigo de Matos</h3>
+                <p>Ensino Médio, Técnico e Superior</p>
+                <p class="institutions-text">CEDUP Renato Ramos da Silva | IFSC – Lages/SC</p>
+            </div>
+            <div class="footer-copyright">
+                <p>&copy; <span id="year"></span> Professor Rodrigo de Matos. Todos os direitos reservados.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="script.js"></script>
+</body>
+
+</html>
