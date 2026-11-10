@@ -18,6 +18,7 @@
 
     <!-- CSS -->
     <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="hero-animation.css">
 </head>
 
 <body data-theme="dark">
@@ -35,6 +36,12 @@
     <main>
         <!-- Hero Section -->
         <section class="hero" id="inicio">
+            <!-- Fundo animado (decorativo) -->
+            <div class="hero-fx" aria-hidden="true">
+                <div class="hero-aurora"></div>
+                <canvas id="hero-canvas"></canvas>
+                <div class="hero-scrim"></div>
+            </div>
             <div class="container hero-container">
                 <div class="hero-content fade-in">
                     <span class="badge">Professor Especialista</span>
@@ -127,7 +134,7 @@
                         <p>Conteúdos voltados à criação de páginas e aplicações web, com foco em HTML, CSS e fundamentos
                             de JavaScript. Inclui exemplos práticos, exercícios e projetos aplicados para diferentes
                             níveis de ensino.</p>
-                        <a href="https://drive.google.com/drive/folders/1RmsDP-jxFK0FlkgyAFfwlvXBsXgXrNu_?usp=drive_link" class="btn btn-outline" target="_blank">
+                        <a href="#" class="btn btn-outline" target="_blank">
                             <i class="fa-brands fa-google-drive"></i> Acessar Material
                         </a>
                     </div>
@@ -137,12 +144,11 @@
                         <div class="card-icon">
                             <i class="fa-solid fa-database"></i>
                         </div>
-                        <h3>Programação de Aplicativos</h3>
-                            <p>
-                                Materiais sobre desenvolvimento de aplicativos, lógica de programação e construção de interfaces.
-                                Inclui exercícios práticos, exemplos e atividades voltadas à criação e implementação de aplicações.
-                            </p>
-                        <a href="https://drive.google.com/drive/folders/1JGc11_KVPUVrOfPBK4iXUugBQiHHVcqA?usp=sharing" class="btn btn-outline" target="_blank">
+                        <h3>Banco de Dados</h3>
+                        <p>Materiais sobre modelagem de dados, linguagem SQL e boas práticas no uso de bancos de dados.
+                            Inclui exercícios práticos, exemplos e atividades voltadas à aplicação real dos conceitos.
+                        </p>
+                        <a href="#" class="btn btn-outline" target="_blank">
                             <i class="fa-brands fa-google-drive"></i> Acessar Material
                         </a>
                     </div>
@@ -152,14 +158,31 @@
                         <div class="card-icon">
                             <i class="fa-solid fa-language"></i>
                         </div>
-                        <h3>Inglês Aplicado</h3>
+                        <h3>Língua Inglesa</h3>
                         <p>Conteúdos de língua inglesa com foco em tecnologia e informática, abordando vocabulário
                             técnico, leitura e interpretação de textos da área de TI.</p>
-                        <a href="https://drive.google.com/drive/folders/1JFZHJCyNo-EdqG1KVYn52K3FMNe1ZgoQ?usp=sharing" class="btn btn-outline" target="_blank">
+                        <a href="#" class="btn btn-outline" target="_blank">
                             <i class="fa-brands fa-google-drive"></i> Acessar Material
                         </a>
                     </div>
                 </div>
+
+                <!-- Aplicativo interativo -->
+                <a href="percepcao.html" class="app-card fade-in" target="_blank" rel="noopener">
+                    <div class="app-card-visual" aria-hidden="true">
+                        <i class="fa-solid fa-music"></i>
+                        <span class="app-card-wave"><span></span><span></span><span></span><span></span><span></span></span>
+                    </div>
+                    <div class="app-card-body">
+                        <span class="app-card-tag">Aplicativo interativo</span>
+                        <h3>Percepção de Intervalos Musicais</h3>
+                        <p>Meu projeto final (TCC) desenvolvido no curso de Bacharelado em Informática.
+                            UNIPLAC - LAGES/SC </p>
+                    </div>
+                    <span class="btn btn-primary app-card-cta">
+                        Abrir aplicativo <i class="fa-solid fa-arrow-up-right-from-square"></i>
+                    </span>
+                </a>
 
                 <div class="drive-info fade-in mt-4">
                     <div class="info-box">
@@ -190,7 +213,7 @@
     </footer>
 
     <script src="script.js"></script>
+    <script src="hero-animation.js" defer></script>
 </body>
-
 
 </html>
