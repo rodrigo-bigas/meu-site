@@ -1,0 +1,206 @@
+/* =========================================================================
+   HERO ANIMATION — camadas visuais do fundo da seção .hero
+   Carregado depois de style.css; só acrescenta/ajusta o que é do HERO.
+   Ordem das camadas dentro de .hero-fx (de trás para frente):
+     .hero-aurora  → luzes azul/ciano difusas, deriva muito lenta
+     #hero-canvas  → partículas, rede, grid e sinais (hero-animation.js)
+     .hero-scrim   → véu de legibilidade atrás do texto
+     ::after       → fusão da base do HERO com a seção seguinte
+   ========================================================================= */
+
+.hero {
+    --fx-deep: #f4f8fd;
+    --fx-mid: #eaf2fb;
+    --fx-glow-1: rgba(0, 120, 220, 0.16);
+    --fx-glow-2: rgba(0, 168, 204, 0.14);
+    --fx-scrim: 255, 255, 255;
+    --fx-scrim-strength: 0.82;
+    --fx-ring-1: rgba(0, 86, 179, 0.55);
+    --fx-ring-2: rgba(0, 168, 204, 0.5);
+
+    position: relative;
+    overflow: hidden;
+    isolation: isolate;          /* z-index negativo fica dentro do HERO */
+    background:
+        radial-gradient(90% 70% at 78% 18%, var(--fx-mid) 0%, transparent 60%),
+        linear-gradient(180deg, var(--fx-deep) 0%, var(--bg-color) 100%);
+}
+
+[data-theme="dark"] .hero {
+    --fx-deep: #0a1220;
+    --fx-mid: #0d2442;
+    --fx-glow-1: rgba(0, 110, 255, 0.22);
+    --fx-glow-2: rgba(0, 210, 255, 0.14);
+    --fx-scrim: 8, 14, 26;
+    --fx-scrim-strength: 0.7;
+    --fx-ring-1: rgba(77, 163, 255, 0.85);
+    --fx-ring-2: rgba(0, 210, 255, 0.85);
+
+    background:
+        radial-gradient(90% 70% at 78% 18%, var(--fx-mid) 0%, transparent 60%),
+        linear-gradient(180deg, #0b1018 0%, var(--fx-deep) 35%, #0b1626 75%, var(--bg-color) 100%);
+}
+
+.hero-fx {
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    pointer-events: none;
+}
+
+.hero-fx > * {
+    position: absolute;
+    inset: 0;
+}
+
+/* Base: funde com a seção "Sobre" sem corte seco */
+.hero-fx::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    height: 140px;
+    background: linear-gradient(180deg, transparent, var(--bg-color));
+}
+
+/* ---------- Luzes difusas ---------- */
+.hero-aurora::before,
+.hero-aurora::after {
+    content: "";
+    position: absolute;
+    border-radius: 50%;
+    filter: blur(60px);
+    will-change: transform;
+}
+
+.hero-aurora::before {
+    width: 55vmax;
+    height: 55vmax;
+    top: -20vmax;
+    right: -12vmax;
+    background: radial-gradient(circle, var(--fx-glow-1) 0%, transparent 65%);
+    animation: hero-drift-a 26s ease-in-out infinite alternate;
+}
+
+.hero-aurora::after {
+    width: 40vmax;
+    height: 40vmax;
+    bottom: -18vmax;
+    left: 20%;
+    background: radial-gradient(circle, var(--fx-glow-2) 0%, transparent 65%);
+    animation: hero-drift-b 32s ease-in-out infinite alternate;
+}
+
+@keyframes hero-drift-a {
+    to { transform: translate3d(-6vmax, 4vmax, 0) scale(1.08); }
+}
+
+@keyframes hero-drift-b {
+    to { transform: translate3d(8vmax, -3vmax, 0) scale(0.94); }
+}
+
+/* ---------- Canvas ---------- */
+#hero-canvas {
+    width: 100%;
+    height: 100%;
+    display: block;
+    opacity: 0;
+    transition: opacity 1.8s ease;
+}
+
+.hero-fx-ready #hero-canvas {
+    opacity: 1;
+}
+
+/* ---------- Véu de legibilidade (texto à esquerda no desktop) ---------- */
+.hero-scrim {
+    background: linear-gradient(
+        90deg,
+        rgba(var(--fx-scrim), var(--fx-scrim-strength)) 0%,
+        rgba(var(--fx-scrim), calc(var(--fx-scrim-strength) * 0.55)) 38%,
+        rgba(var(--fx-scrim), 0) 62%
+    );
+}
+
+/* Conteúdo sempre acima das camadas */
+.hero .hero-container {
+    position: relative;
+    z-index: 1;
+}
+
+/* ---------- Anel de luz em volta da foto ---------- */
+.hero-image {
+    position: relative;
+}
+
+.hero-image::before {
+    content: "";
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 382px;
+    height: 382px;
+    margin: -191px 0 0 -191px;
+    border-radius: 50%;
+    background: conic-gradient(
+        from 0deg,
+        transparent 0deg,
+        var(--fx-ring-1) 60deg,
+        transparent 140deg,
+        transparent 200deg,
+        var(--fx-ring-2) 260deg,
+        transparent 330deg
+    );
+    -webkit-mask: radial-gradient(farthest-side, transparent calc(100% - 2px), #000 calc(100% - 1.5px));
+    mask: radial-gradient(farthest-side, transparent calc(100% - 2px), #000 calc(100% - 1.5px));
+    animation: hero-ring 18s linear infinite;
+}
+
+[data-theme="dark"] .hero .image-wrapper {
+    box-shadow:
+        0 0 0 1px rgba(0, 210, 255, 0.18),
+        0 0 70px rgba(0, 140, 255, 0.22),
+        var(--shadow-lg);
+}
+
+@keyframes hero-ring {
+    to { transform: rotate(360deg); }
+}
+
+/* ---------- Responsivo ---------- */
+@media (max-width: 768px) {
+    /* No celular o texto fica abaixo da foto e centralizado */
+    .hero-scrim {
+        background: linear-gradient(
+            180deg,
+            rgba(var(--fx-scrim), 0) 0%,
+            rgba(var(--fx-scrim), calc(var(--fx-scrim-strength) * 0.6)) 42%,
+            rgba(var(--fx-scrim), var(--fx-scrim-strength)) 100%
+        );
+    }
+
+    .hero-aurora::before,
+    .hero-aurora::after {
+        filter: blur(40px);
+    }
+
+    .hero-image::before {
+        width: 278px;
+        height: 278px;
+        margin: -139px 0 0 -139px;
+    }
+}
+
+/* ---------- Movimento reduzido ---------- */
+@media (prefers-reduced-motion: reduce) {
+    .hero-aurora::before,
+    .hero-aurora::after,
+    .hero-image::before {
+        animation: none;
+    }
+
+    #hero-canvas {
+        transition: none;
+    }
+}

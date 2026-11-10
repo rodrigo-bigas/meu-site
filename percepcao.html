@@ -1,0 +1,800 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>Percepção de Intervalos</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Condensed:wght@500;600&family=IBM+Plex+Sans:wght@400;500;600&family=Share+Tech+Mono&display=swap">
+<style>
+/* Layout: painel de instrumento (visor LCD + controles) sobre um teclado virtual; abas para desempenho e teoria. */
+:root{
+  --bg:#e4e7ea; --panel:#f3f4f5; --raise:#ffffff; --ink:#1b232b; --muted:#5a6570; --line:#c3c9cf;
+  --accent:#d9480f; --accent-ink:#ffffff; --first:#2c6bd8; --ok:#2b8a3e; --bad:#c92a2a;
+  --lcd:#211b12; --lcd-ink:#ffb547; --lcd-dim:#9a7643;
+  --kw:#fbfaf7; --kw-edge:#b9bdc2; --kb:#17191b; --case:#2b3138; --case-ink:#c9d0d6;
+  --f-ui:'IBM Plex Sans',system-ui,-apple-system,'Segoe UI',sans-serif;
+  --f-label:'IBM Plex Sans Condensed','IBM Plex Sans',system-ui,sans-serif;
+  --f-lcd:'Share Tech Mono',ui-monospace,'Courier New',monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#121619; --panel:#1a1f24; --raise:#222930; --ink:#e3e8ec; --muted:#93a0ab; --line:#313a43;
+  --accent:#ff7a3d; --accent-ink:#1a0d05; --first:#5b8ff2; --ok:#51cf66; --bad:#ff6b6b;
+  --lcd:#17130c; --lcd-ink:#ffbd5c; --lcd-dim:#8a6a3a;
+  --kw:#eeece6; --kw-edge:#8d939a; --kb:#0b0c0d; --case:#0d1013; --case-ink:#9aa5af; color-scheme:dark }}
+:root[data-theme="dark"]{
+  --bg:#121619; --panel:#1a1f24; --raise:#222930; --ink:#e3e8ec; --muted:#93a0ab; --line:#313a43;
+  --accent:#ff7a3d; --accent-ink:#1a0d05; --first:#5b8ff2; --ok:#51cf66; --bad:#ff6b6b;
+  --lcd:#17130c; --lcd-ink:#ffbd5c; --lcd-dim:#8a6a3a;
+  --kw:#eeece6; --kw-edge:#8d939a; --kb:#0b0c0d; --case:#0d1013; --case-ink:#9aa5af; color-scheme:dark }
+
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+body{background:var(--bg);color:var(--ink);font-family:var(--f-ui);font-size:15px;line-height:1.5;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:0 40px}
+.wrap{max-width:1180px;margin:0 auto}
+h1,h2,h3{text-wrap:balance;margin:0}
+.label{font-family:var(--f-label);font-weight:600;font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+button,select,input{font:inherit;color:inherit}
+button{cursor:pointer}
+:focus-visible{outline:2px solid var(--first);outline-offset:2px}
+
+/* Topo */
+.top{display:flex;flex-wrap:wrap;align-items:center;gap:12px 20px;padding-block:18px 14px}
+.brand{display:flex;align-items:center;gap:12px;margin-right:auto;min-width:0}
+.brand svg{flex:none}
+.brand h1{font-family:var(--f-label);font-weight:600;font-size:22px;letter-spacing:.01em;line-height:1.1}
+.brand p{margin:0;color:var(--muted);font-size:13px}
+.tabs{display:flex;gap:4px;background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:4px;flex-wrap:wrap}
+.tabs button{border:0;background:transparent;padding:6px 12px;border-radius:7px;font-family:var(--f-label);font-weight:600;font-size:14px;color:var(--muted)}
+.tabs button[aria-selected="true"]{background:var(--raise);color:var(--ink);box-shadow:0 1px 2px rgba(0,0,0,.12)}
+.chip{display:inline-flex;align-items:center;gap:8px;border:1px solid var(--line);background:var(--raise);border-radius:999px;padding:6px 14px;font-size:14px}
+.chip b{font-weight:600}
+
+/* Painel do instrumento */
+.panel{display:grid;grid-template-columns:minmax(0,1.5fr) minmax(0,1fr);gap:16px;background:var(--panel);border:1px solid var(--line);border-radius:14px 14px 0 0;padding:16px}
+@media (max-width:820px){.panel{grid-template-columns:minmax(0,1fr)}}
+.lcd{background:var(--lcd);color:var(--lcd-ink);font-family:var(--f-lcd);border-radius:8px;padding:14px 16px;min-height:178px;display:flex;flex-direction:column;gap:6px;
+  box-shadow:inset 0 2px 10px rgba(0,0,0,.55);text-shadow:0 0 6px rgba(255,170,60,.35);min-width:0}
+.lcd-top{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;font-size:13px;color:var(--lcd-dim);letter-spacing:.06em}
+.lcd-title{font-size:30px;line-height:1.15;letter-spacing:.02em;overflow-wrap:anywhere}
+.lcd-sub{font-size:15px;display:flex;gap:6px 16px;flex-wrap:wrap}
+.lcd-msg{margin-top:auto;font-size:16px;min-height:1.5em;overflow-wrap:anywhere}
+.lcd-msg.ok{color:#8ff0a4}.lcd-msg.bad{color:#ff8f8f}
+.dots{display:inline-flex;gap:5px;align-items:center}
+.dots i{width:9px;height:9px;border-radius:50%;border:1px solid var(--lcd-ink);display:inline-block}
+.dots i.on{background:var(--lcd-ink)}
+.progress{height:4px;background:rgba(255,181,71,.18);border-radius:2px;overflow:hidden}
+.progress span{display:block;height:100%;background:var(--lcd-ink);width:0;transition:width .3s}
+
+.controls{display:flex;flex-direction:column;gap:12px;min-width:0}
+.field{display:flex;flex-direction:column;gap:4px}
+.row{display:flex;gap:10px;flex-wrap:wrap}
+.row > .field{flex:1 1 150px;min-width:0}
+select,input[type=text]{background:var(--raise);border:1px solid var(--line);border-radius:8px;padding:8px 10px;width:100%}
+input[type=range]{width:100%;accent-color:var(--accent)}
+.btns{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.btn{border:1px solid var(--line);background:var(--raise);border-radius:9px;padding:10px 12px;font-family:var(--f-label);font-weight:600;font-size:15px;display:flex;align-items:center;justify-content:center;gap:8px;min-height:44px}
+.btn:hover:not(:disabled){border-color:var(--muted)}
+.btn:disabled{opacity:.45;cursor:not-allowed}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+.btn.go{background:var(--ok);border-color:var(--ok);color:#fff}
+.btn svg{flex:none}
+.hint{font-size:13px;color:var(--muted);margin:0}
+
+/* Teclado */
+.kb-case{background:var(--case);border-radius:0 0 14px 14px;padding:10px 12px 14px}
+.kb-head{display:flex;justify-content:space-between;gap:8px 16px;flex-wrap:wrap;color:var(--case-ink);font-size:12.5px;padding:0 2px 8px}
+.kb-head kbd{font-family:var(--f-lcd);background:rgba(255,255,255,.08);border-radius:3px;padding:0 4px}
+.kb-scroll{overflow-x:auto;overflow-y:hidden;-webkit-overflow-scrolling:touch;border-radius:4px}
+.kb{position:relative;display:flex;height:150px;user-select:none;-webkit-user-select:none;touch-action:manipulation}
+@media (max-width:600px){.kb{height:130px}}
+.key{position:relative;cursor:pointer}
+.key.w{flex:1 1 0;background:var(--kw);border:1px solid var(--kw-edge);border-top:0;border-radius:0 0 5px 5px;margin-right:-1px}
+.key.b{position:absolute;top:0;height:60%;background:var(--kb);border-radius:0 0 4px 4px;z-index:2;box-shadow:0 2px 3px rgba(0,0,0,.5)}
+.key .nm{position:absolute;bottom:6px;left:0;right:0;text-align:center;font-family:var(--f-label);font-size:10.5px;color:#6b7178;pointer-events:none}
+.key.down.w{background:#e3e6e9}.key.down.b{background:#3a3f45}
+.key.lit.w{background:#ffd9b8}.key.lit.b{background:#c2571d}
+.key.first.w{background:var(--first)}.key.first.b{background:var(--first)}
+.key.first .nm{color:#fff}
+.key.ok.w,.key.ok.b{background:var(--ok)}
+.key.ok .nm{color:#fff}
+.key.bad.w,.key.bad.b{background:var(--bad)}
+.key.reveal.w,.key.reveal.b{background:var(--ok);animation:pulse .7s ease-in-out 3}
+.key[data-tag]::after{content:attr(data-tag);position:absolute;left:50%;transform:translateX(-50%);bottom:24px;font-family:var(--f-lcd);font-size:12px;color:#fff;background:rgba(0,0,0,.55);padding:0 4px;border-radius:3px;white-space:nowrap}
+.key.b[data-tag]::after{bottom:8px}
+@keyframes pulse{50%{filter:brightness(1.35)}}
+@media (prefers-reduced-motion:reduce){.key.reveal.w,.key.reveal.b{animation:none}.progress span{transition:none}}
+
+/* Mapa de módulos */
+.section{margin-top:22px}
+.sec-head{display:flex;justify-content:space-between;align-items:baseline;gap:8px 16px;flex-wrap:wrap;margin-bottom:10px}
+.sec-head h2{font-family:var(--f-label);font-weight:600;font-size:18px}
+.legend{display:flex;gap:12px;flex-wrap:wrap;font-size:13px;color:var(--muted)}
+.legend span{display:inline-flex;align-items:center;gap:6px}
+.sw{width:12px;height:12px;border-radius:3px;border:1px solid var(--line);background:var(--raise);display:inline-block}
+.sw.done{background:var(--ok);border-color:var(--ok)}.sw.fail{border:2px solid var(--bad)}.sw.cur{outline:2px solid var(--accent);outline-offset:1px}
+.mapa{display:grid;gap:8px}
+.etapa-row{display:grid;grid-template-columns:150px minmax(0,1fr);gap:10px;align-items:center}
+@media (max-width:640px){.etapa-row{grid-template-columns:minmax(0,1fr)}}
+.etapa-nome{font-size:13px;line-height:1.3}
+.etapa-nome b{font-family:var(--f-label);font-size:15px;display:block}
+.etapa-nome span{color:var(--muted)}
+.cells{display:grid;grid-template-columns:repeat(10,minmax(0,1fr));gap:6px}
+.cell{border:1px solid var(--line);background:var(--raise);border-radius:7px;padding:6px 0;font-family:var(--f-lcd);font-size:14px;text-align:center;min-height:36px;font-variant-numeric:tabular-nums}
+.cell.done{background:var(--ok);border-color:var(--ok);color:#fff}
+.cell.fail{border:2px solid var(--bad)}
+.cell.cur{outline:2px solid var(--accent);outline-offset:2px}
+.modinfo{margin-top:12px;background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:12px 14px;display:flex;gap:6px 22px;flex-wrap:wrap;font-size:14px}
+.modinfo b{font-weight:600}
+
+/* Desempenho */
+.card{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:16px}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px}
+.stat{background:var(--raise);border:1px solid var(--line);border-radius:10px;padding:10px 12px}
+.stat .v{font-family:var(--f-lcd);font-size:26px;font-variant-numeric:tabular-nums;line-height:1.2}
+.grid2{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:16px}
+@media (max-width:820px){.grid2{grid-template-columns:minmax(0,1fr)}}
+.bars{display:flex;flex-direction:column;gap:6px}
+.bar{display:grid;grid-template-columns:150px minmax(0,1fr) 74px;gap:10px;align-items:center;font-size:13.5px}
+.bar .track{height:12px;background:var(--raise);border:1px solid var(--line);border-radius:6px;overflow:hidden}
+.bar .fill{height:100%;background:var(--first)}
+.bar.hard .fill{background:var(--bad)}
+.bar .n{text-align:right;font-variant-numeric:tabular-nums;color:var(--muted)}
+.tbl-wrap{overflow-x:auto}
+table{border-collapse:collapse;width:100%;font-size:14px}
+th,td{text-align:left;padding:7px 10px;border-bottom:1px solid var(--line);white-space:nowrap}
+th{font-family:var(--f-label);font-weight:600;font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+td.num{font-variant-numeric:tabular-nums}
+.pill{display:inline-block;border-radius:999px;padding:1px 9px;font-size:12.5px;font-weight:600}
+.pill.ok{background:color-mix(in srgb,var(--ok) 18%,transparent);color:var(--ok)}
+.pill.bad{background:color-mix(in srgb,var(--bad) 16%,transparent);color:var(--bad)}
+.empty{color:var(--muted);padding:12px 0}
+.prose{max-width:68ch}
+.prose p{margin:.5em 0}
+.prose ol,.prose ul{padding-left:1.3em}
+.mini-btn{border:1px solid var(--line);background:var(--raise);border-radius:6px;padding:3px 10px;font-size:13px}
+.danger{border-color:var(--bad);color:var(--bad)}
+.stack{display:flex;flex-direction:column;gap:16px}
+
+/* Overlay aluno */
+.overlay{position:fixed;inset:0;background:rgba(10,14,18,.55);display:flex;align-items:center;justify-content:center;padding:16px;z-index:50}
+.dialog{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:20px;width:min(440px,100%);display:flex;flex-direction:column;gap:14px;max-height:90vh;overflow:auto}
+.dialog h2{font-family:var(--f-label);font-size:20px}
+.lista{display:flex;flex-direction:column;gap:6px}
+.lista button{text-align:left;border:1px solid var(--line);background:var(--raise);border-radius:8px;padding:8px 12px}
+.lista button.sel{border-color:var(--accent);box-shadow:0 0 0 1px var(--accent)}
+form.inline{display:flex;gap:8px}
+form.inline input{flex:1;min-width:0}
+</style>
+
+<div class="wrap">
+<header class="top">
+  <div class="brand">
+    <svg width="40" height="40" viewBox="0 0 40 40" aria-hidden="true"><rect width="40" height="40" rx="9" fill="var(--case)"/><g stroke="var(--case-ink)" stroke-width="1"><line x1="6" y1="12" x2="34" y2="12"/><line x1="6" y1="17" x2="34" y2="17"/><line x1="6" y1="22" x2="34" y2="22"/><line x1="6" y1="27" x2="34" y2="27"/></g><ellipse cx="14" cy="27" rx="3.6" ry="2.6" fill="var(--first)"/><ellipse cx="26" cy="17" rx="3.6" ry="2.6" fill="var(--accent)"/></svg>
+    <div><h1>Percepção de Intervalos</h1><p>Sintetizador com exercícios de intervalo musical</p></div>
+  </div>
+  <nav class="tabs" role="tablist" aria-label="Seções">
+    <button role="tab" data-tab="treino" aria-selected="true">Treino</button>
+    <button role="tab" data-tab="desempenho" aria-selected="false">Desempenho</button>
+    <button role="tab" data-tab="teoria" aria-selected="false">Teoria</button>
+    <button role="tab" data-tab="sobre" aria-selected="false">Sobre</button>
+  </nav>
+  <button class="chip" id="alunoChip" type="button"><span class="label" style="font-size:11px">Aluno</span><b id="alunoNome">—</b></button>
+</header>
+
+<main>
+<!-- ============ TREINO ============ -->
+<section id="tab-treino">
+  <div class="panel">
+    <div class="lcd" aria-live="polite">
+      <div class="lcd-top"><span id="lcdTop">ETAPA I · MÓDULO 01/40</span><span id="lcdPts"></span></div>
+      <div class="lcd-title" id="lcdTitle">Quintas</div>
+      <div class="lcd-sub" id="lcdSub"></div>
+      <div class="progress"><span id="lcdProg"></span></div>
+      <div class="lcd-msg" id="lcdMsg">Toque o teclado para ouvir as notas.</div>
+    </div>
+    <div class="controls">
+      <div class="row">
+        <div class="field"><label class="label" for="timbre">Timbre</label><select id="timbre"></select></div>
+        <div class="field"><label class="label" for="volume">Volume</label><input type="range" id="volume" min="0" max="100" value="70"></div>
+      </div>
+      <div class="btns">
+        <button class="btn" id="btnExemplo" type="button"><svg width="16" height="16" viewBox="0 0 16 16"><path d="M4 2.5v11l9-5.5z" fill="currentColor"/></svg>Tocar exemplo</button>
+        <button class="btn primary" id="btnIniciar" type="button"><svg width="16" height="16" viewBox="0 0 16 16"><path d="M2 8h9M8 4l4 4-4 4" stroke="currentColor" stroke-width="2" fill="none"/></svg>Iniciar exercício</button>
+        <button class="btn" id="btnRepetir" type="button" disabled><svg width="16" height="16" viewBox="0 0 16 16"><path d="M13 8a5 5 0 1 1-1.5-3.6M12 1.5V5H8.5" stroke="currentColor" stroke-width="1.8" fill="none"/></svg>Ouvir de novo</button>
+        <button class="btn" id="btnParar" type="button" disabled><svg width="16" height="16" viewBox="0 0 16 16"><rect x="3.5" y="3.5" width="9" height="9" fill="currentColor"/></svg>Parar</button>
+      </div>
+      <button class="btn go" id="btnAvancar" type="button" hidden>Avançar</button>
+      <p class="hint" id="dica">No exercício, a 1ª nota fica <b style="color:var(--first)">azul</b>. Toque no teclado a 2ª nota que você ouviu. Duas chances: 10 pontos na 1ª, 7 na 2ª.</p>
+    </div>
+  </div>
+  <div class="kb-case">
+    <div class="kb-head"><span id="kbFaixa">Teclado</span><span>Teclado do computador: <kbd>A</kbd><kbd>W</kbd><kbd>S</kbd>…<kbd>K</kbd> · <kbd>Z</kbd>/<kbd>X</kbd> mudam a oitava (<span id="kbBase">Dó4</span>)</span></div>
+    <div class="kb-scroll" id="kbScroll"><div class="kb" id="kb"></div></div>
+  </div>
+
+  <div class="section">
+    <div class="sec-head">
+      <h2>Graus de dificuldade</h2>
+      <div class="legend"><span><i class="sw done"></i>Aprovado</span><span><i class="sw fail"></i>Abaixo da meta</span><span><i class="sw cur"></i>Selecionado</span></div>
+    </div>
+    <div class="mapa" id="mapa"></div>
+    <div class="modinfo" id="modinfo"></div>
+  </div>
+</section>
+
+<!-- ============ DESEMPENHO ============ -->
+<section id="tab-desempenho" hidden>
+  <div class="stack">
+    <div class="card">
+      <div class="row" style="align-items:flex-end">
+        <div class="field" style="flex:1 1 240px"><label class="label" for="selAluno">Acompanhar aluno</label><select id="selAluno"></select></div>
+        <button class="mini-btn danger" id="btnApagar" type="button">Apagar histórico</button>
+      </div>
+    </div>
+    <div id="desempConteudo"></div>
+  </div>
+</section>
+
+<!-- ============ TEORIA ============ -->
+<section id="tab-teoria" hidden>
+  <div class="stack">
+    <div class="card prose" style="max-width:none">
+      <h2 style="font-family:var(--f-label)">Intervalos a partir de Dó</h2>
+      <p class="hint">Intervalo é a diferença de altura entre dois sons, medida em tons e semitons. Toque ▶ para ouvir cada intervalo a partir de Dó4, subindo.</p>
+      <div class="tbl-wrap"><table id="quadro1"><thead><tr><th></th><th>Notas extremas</th><th>Distância</th><th>Nome do intervalo</th><th>Sonoridade</th></tr></thead><tbody></tbody></table></div>
+    </div>
+    <div class="grid2">
+      <div class="card prose">
+        <h2 style="font-family:var(--f-label)">Por que esta sequência</h2>
+        <p>Segundo os professores entrevistados, o estudo começa pelos intervalos <b>melódicos</b> e <b>consonantes</b>, mais fáceis de assimilar: quintas e quartas justas, depois a oitava, depois terças e sextas. Só então vêm os <b>dissonantes</b>: segundas, sétimas, aumentados e diminutos.</p>
+        <p>Dentro de cada intervalo o aluno treina primeiro <b>ascendente</b>, depois <b>descendente</b>, depois <b>alternado</b>.</p>
+        <ol id="listaMod"></ol>
+      </div>
+      <div class="card prose">
+        <h2 style="font-family:var(--f-label)">Etapas e avaliação</h2>
+        <div class="tbl-wrap"><table><thead><tr><th>Etapa</th><th>Módulos</th><th>Oitavas</th><th>Timbre</th></tr></thead><tbody id="tbEtapas"></tbody></table></div>
+        <p><b>Pontuação.</b> Cada questão dá duas chances: acerto na 1ª vale 10 pontos, na 2ª vale 7, sem acerto vale 0.</p>
+        <p><b>Aprovação.</b> Ao atingir a meta do módulo (70% da pontuação máxima), o aluno é liberado para o módulo seguinte. Abaixo da meta, repete o módulo.</p>
+        <p><b>Timbre livre.</b> Nas etapas III e IV, cada questão sorteia um timbre diferente, para separar a percepção de altura da percepção de timbre.</p>
+        <p><b>Foco nas dificuldades.</b> Os intervalos que o aluno mais erra aparecem com mais frequência nos exercícios seguintes.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ SOBRE ============ -->
+<section id="tab-sobre" hidden>
+  <div class="stack">
+    <div class="card prose">
+      <h2 style="font-family:var(--f-label)">Sobre esta reconstrução</h2>
+      <p>Versão web do sistema <b>“Sintetizador com Exercícios de Intervalo Musical”</b>, desenvolvido em Java (Java Sound/MIDI) com MySQL no TCC <i>Informática aplicada ao ensino de conceitos musicais</i>, de Rodrigo de Matos (Curso de Informática – Bacharelado, UNIPLAC, Lages, 2004), orientado pelo Prof. Wilson Castello Branco Neto, M. Eng.</p>
+      <p>Funciona direto no navegador: o som é sintetizado com a Web Audio API e os dados do aluno ficam salvos neste navegador.</p>
+      <p><b>O que foi além do original.</b> O relatório registra que não foi possível criar o mecanismo de aprovação automática entre módulos, e sugere como trabalho futuro identificar o intervalo de maior dificuldade e direcionar os exercícios para ele. Esta versão implementa as duas coisas.</p>
+    </div>
+    <div class="card">
+      <h2 style="font-family:var(--f-label);font-size:18px;margin-bottom:10px">Correspondência com o diagrama de classes</h2>
+      <div class="tbl-wrap"><table>
+        <thead><tr><th>Classe (TCC, 2004)</th><th>Objeto JavaScript</th><th>Responsabilidade</th></tr></thead>
+        <tbody>
+          <tr><td>Teclado</td><td><code>Teclado</code></td><td>Desenha o teclado virtual e marca as teclas</td></tr>
+          <tr><td>Professor</td><td><code>Professor</code></td><td>Exemplos, exercícios, correção e pontuação</td></tr>
+          <tr><td>Exercícios</td><td><code>MODULOS</code>, <code>ETAPAS</code></td><td>Descrição, total de repetições, mínimo para aprovação</td></tr>
+          <tr><td>Intervalos</td><td><code>MODULOS[i].iv</code></td><td>Intervalos de cada módulo, em semitons</td></tr>
+          <tr><td>Aluno</td><td><code>Aluno</code></td><td>Cadastro e seleção do aluno</td></tr>
+          <tr><td>Desempenho</td><td><code>Desempenho</code></td><td>Pontuação, situação e data de cada execução</td></tr>
+          <tr><td>Java Sound (MIDI)</td><td><code>Som</code></td><td>Sintetiza as notas (número MIDI → frequência)</td></tr>
+        </tbody>
+      </table></div>
+    </div>
+  </div>
+</section>
+</main>
+</div>
+
+<div class="overlay" id="overlay" hidden>
+  <div class="dialog" role="dialog" aria-modal="true" aria-labelledby="dlgTitulo">
+    <h2 id="dlgTitulo">Aluno</h2>
+    <p class="hint" id="dlgMsg">Escolha seu nome ou cadastre-se para registrar o desempenho.</p>
+    <div class="lista" id="dlgLista"></div>
+    <form class="inline" id="formAluno">
+      <input type="text" id="novoNome" placeholder="Nome do aluno" maxlength="60" autocomplete="off" aria-label="Nome do novo aluno">
+      <button class="btn primary" type="submit">Cadastrar</button>
+    </form>
+    <button class="btn" type="button" id="dlgFechar">Fechar</button>
+  </div>
+</div>
+
+<script>
+'use strict';
+const $ = s => document.querySelector(s);
+const wait = ms => new Promise(r => setTimeout(r, ms));
+
+/* ================= Teoria: notas e intervalos ================= */
+const NOMES = ['Dó','Dó#','Ré','Ré#','Mi','Fá','Fá#','Sol','Sol#','Lá','Lá#','Si'];
+const PRETAS = new Set([1,3,6,8,10]);
+const nomeNota = m => NOMES[m % 12] + (Math.floor(m / 12) - 1);   // MIDI 60 = Dó4
+const NOME_SEMI = {1:'2ª menor',2:'2ª maior',3:'2ª aum. / 3ª menor',4:'3ª maior',5:'4ª justa',6:'4ª aum. / 5ª dim.',7:'5ª justa',8:'5ª aum. / 6ª menor',9:'6ª maior',10:'7ª menor',11:'7ª maior',12:'8ª justa'};
+function tons(s){ const t = Math.floor(s/2), r = s%2; if(!t) return '1 semitom'; return t + (t>1?' tons':' tom') + (r?' e meio':''); }
+const SETA = {asc:'↑', desc:'↓'};
+const FASE_NOME = {asc:'Ascendente ↑', desc:'Descendente ↓', alt:'Alternado ↕'};
+
+/* ================= Exercícios e Intervalos (estrutura do cap. 4.3.1) ================= */
+const ETAPAS = [
+  {n:'I',   oit:2, lo:48, kbLo:36, kbHi:84, timbre:'fixo'},
+  {n:'II',  oit:4, lo:36, kbLo:24, kbHi:96, timbre:'fixo'},
+  {n:'III', oit:4, lo:36, kbLo:24, kbHi:96, timbre:'livre'},
+  {n:'IV',  oit:6, lo:24, kbLo:24, kbHi:96, timbre:'livre'}
+];
+const F3 = ['asc','desc','alt'];
+const MODULOS = [
+  {t:'Quintas', d:'Reconhecer e diferenciar quintas justa, aumentada e diminuta.', iv:{6:'5ª diminuta',7:'5ª justa',8:'5ª aumentada'}, fases:F3, porFase:4},
+  {t:'Quartas', d:'Reconhecer e diferenciar quartas justa e aumentada.', iv:{5:'4ª justa',6:'4ª aumentada'}, fases:F3, porFase:4},
+  {t:'Oitava', d:'Reconhecer o intervalo de oitava.', iv:{12:'8ª justa'}, fases:F3, porFase:3},
+  {t:'Quartas, quintas e oitava', d:'Diferenciar quartas, quintas e oitavas em todas as possibilidades.', iv:{5:'4ª justa',6:'Trítono (4ª aum. / 5ª dim.)',7:'5ª justa',8:'5ª aumentada',12:'8ª justa'}, fases:['alt'], porFase:12},
+  {t:'Terças', d:'Reconhecer e diferenciar terças maior e menor.', iv:{3:'3ª menor',4:'3ª maior'}, fases:F3, porFase:4},
+  {t:'Sextas', d:'Reconhecer e diferenciar sextas maior e menor.', iv:{8:'6ª menor',9:'6ª maior'}, fases:F3, porFase:4},
+  {t:'Terças a oitavas', d:'Terças, quartas, quintas, sextas e oitavas, todas alternadas.', iv:{3:'3ª menor',4:'3ª maior',5:'4ª justa',6:'Trítono',7:'5ª justa',8:'6ª menor',9:'6ª maior',12:'8ª justa'}, fases:['alt'], porFase:14},
+  {t:'Segundas', d:'Reconhecer e diferenciar segundas maior, menor e aumentada.', iv:{1:'2ª menor',2:'2ª maior',3:'2ª aumentada'}, fases:F3, porFase:4},
+  {t:'Sétimas', d:'Reconhecer e diferenciar sétimas maior e menor.', iv:{10:'7ª menor',11:'7ª maior'}, fases:F3, porFase:4},
+  {t:'Todos os intervalos', d:'Todos os intervalos, ascendentes e descendentes, alternados.', iv:{1:'2ª menor',2:'2ª maior',3:'3ª menor',4:'3ª maior',5:'4ª justa',6:'Trítono',7:'5ª justa',8:'6ª menor',9:'6ª maior',10:'7ª menor',11:'7ª maior',12:'8ª justa'}, fases:['alt'], porFase:16}
+];
+function modInfo(gi){
+  const e = ETAPAS[Math.floor(gi/10)], m = MODULOS[gi%10];
+  const total = m.fases.length * m.porFase, max = total*10;
+  return {gi, ei:Math.floor(gi/10), e, m, total, max, meta:Math.ceil(max*0.7)};
+}
+
+/* ================= Persistência (substitui o MySQL) ================= */
+const CHAVE = 'percepcao-intervalos-v1';
+let DB = {alunos:[], desempenho:[], stats:{}, atual:null};
+try { const raw = localStorage.getItem(CHAVE); if (raw) DB = Object.assign(DB, JSON.parse(raw)); } catch(e) {}
+function salvar(){ try { localStorage.setItem(CHAVE, JSON.stringify(DB)); } catch(e) {} }
+
+const Aluno = {
+  atual(){ return DB.alunos.find(a => a.id === DB.atual) || null; },
+  cadastrar(nome){
+    nome = nome.trim(); if (!nome) return null;
+    const ex = DB.alunos.find(a => a.nome.toLowerCase() === nome.toLowerCase());
+    if (ex) { this.selecionar(ex.id); return ex; }
+    const a = {id:'a'+Date.now().toString(36), nome, gi:0, criado:new Date().toISOString()};
+    DB.alunos.push(a); DB.atual = a.id; salvar(); return a;
+  },
+  selecionar(id){ DB.atual = id; salvar(); const a = this.atual(); if (a) S.gi = a.gi || 0; },
+  guardarModulo(gi){ const a = this.atual(); if (a){ a.gi = gi; salvar(); } }
+};
+
+const Desempenho = {
+  registrar(r){ DB.desempenho.push(r); salvar(); },
+  doAluno(id){ return DB.desempenho.filter(r => r.alunoId === id); },
+  status(id, gi){
+    const rs = DB.desempenho.filter(r => r.alunoId === id && r.gi === gi);
+    if (!rs.length) return null;
+    return rs.some(r => r.situacao === 'Aprovado') ? 'done' : 'fail';
+  },
+  stat(id, semi, primeira, acertou){
+    const st = DB.stats[id] = DB.stats[id] || {};
+    const x = st[semi] = st[semi] || {t:0, h1:0, h:0};
+    x.t++; if (primeira && acertou) x.h1++; if (acertou) x.h++;
+    salvar();
+  }
+};
+
+/* ================= Som (Web Audio no lugar do Java Sound/MIDI) ================= */
+const TIMBRES = {
+  piano:     {nome:'Piano', harm:[1,.55,.32,.2,.12,.07,.05,.03,.02], detune:[-2,2], a:.004, decay:.9, rel:.3, gain:.5, lpDecay:[10,3]},
+  cravo:     {nome:'Cravo', harm:[1,.75,.6,.5,.42,.36,.3,.26,.22,.18,.15,.12], a:.002, decay:.45, rel:.12, gain:.28},
+  orgao:     {nome:'Órgão', harm:[1,.9,.55,.45,0,.35,0,.25], a:.02, sus:1, rel:.07, gain:.3},
+  flauta:    {nome:'Flauta', harm:[1,.18,.05,.02], a:.08, sus:.9, rel:.12, vib:{rate:5,depth:.004,delay:.2}, gain:.55},
+  clarinete: {nome:'Clarinete', harm:[1,0,.5,0,.3,0,.15,0,.08], a:.04, sus:.9, rel:.1, gain:.42},
+  cordas:    {nome:'Cordas', type:'sawtooth', detune:[-6,6], a:.16, sus:.85, rel:.3, vib:{rate:5.5,depth:.005,delay:.25}, lp:2600, gain:.22},
+  vibrafone: {nome:'Vibrafone', harm:[1,0,0,.28,0,0,0,0,0,.06], a:.003, decay:1.6, rel:.5, trem:{rate:5.5,depth:.25}, gain:.5},
+  sinte:     {nome:'Sintetizador', type:'sawtooth', detune:[-10,10], a:.06, sus:.75, rel:.25, lp:1800, gain:.2}
+};
+const Som = {
+  ctx:null, out:null, waves:{}, vol:.7,
+  init(){
+    if (!this.ctx){
+      const AC = window.AudioContext || window.webkitAudioContext; if (!AC) return false;
+      this.ctx = new AC(); this.out = this.ctx.createGain(); this.out.gain.value = this.vol;
+      const comp = this.ctx.createDynamicsCompressor(); comp.threshold.value = -14; comp.ratio.value = 4;
+      this.out.connect(comp); comp.connect(this.ctx.destination);
+    }
+    if (this.ctx.state === 'suspended') this.ctx.resume();
+    return true;
+  },
+  volume(v){ this.vol = v; if (this.out) this.out.gain.value = v; },
+  onda(k, harm){
+    if (!this.waves[k]){ const n = harm.length+1, re = new Float32Array(n), im = new Float32Array(n); harm.forEach((h,i)=> im[i+1] = h); this.waves[k] = this.ctx.createPeriodicWave(re, im); }
+    return this.waves[k];
+  },
+  /* tocarNota(nota MIDI, duração em s, timbre) */
+  nota(m, dur, tk){
+    if (!this.init()) return;
+    const c = this.ctx, T = TIMBRES[tk] || TIMBRES.piano, t0 = c.currentTime + .01;
+    const f = 440 * Math.pow(2, (m-69)/12), fim = t0 + dur, stop = fim + T.rel + .1;
+    const g = c.createGain(); g.gain.value = 0; let node = g;
+    if (T.lp || T.lpDecay){
+      const fl = c.createBiquadFilter(); fl.type = 'lowpass'; fl.Q.value = .7;
+      if (T.lpDecay){ fl.frequency.setValueAtTime(Math.min(f*T.lpDecay[0],18000), t0); fl.frequency.setTargetAtTime(Math.min(f*T.lpDecay[1],18000), t0, .35); }
+      else fl.frequency.value = T.lp;
+      g.connect(fl); node = fl;
+    }
+    if (T.trem){
+      const tg = c.createGain(); tg.gain.value = 1 - T.trem.depth/2; node.connect(tg); node = tg;
+      const l = c.createOscillator(), lg = c.createGain(); l.frequency.value = T.trem.rate; lg.gain.value = T.trem.depth/2;
+      l.connect(lg); lg.connect(tg.gain); l.start(t0); l.stop(stop);
+    }
+    node.connect(this.out);
+    const det = T.detune || [0], oscs = det.map(d => {
+      const o = c.createOscillator();
+      if (T.harm) o.setPeriodicWave(this.onda(tk, T.harm)); else o.type = T.type;
+      o.frequency.value = f; o.detune.value = d; o.connect(g); return o;
+    });
+    if (T.vib){
+      const l = c.createOscillator(), lg = c.createGain(); l.frequency.value = T.vib.rate; lg.gain.value = f*T.vib.depth;
+      l.connect(lg); oscs.forEach(o => lg.connect(o.frequency)); l.start(t0 + (T.vib.delay||0)); l.stop(stop);
+    }
+    const comp = Math.min(1.5, Math.max(.6, Math.pow(261.6/f, .2)));
+    const pk = T.gain / Math.sqrt(det.length) * comp;
+    g.gain.setValueAtTime(0, t0); g.gain.linearRampToValueAtTime(pk, t0 + T.a);
+    if (T.decay) g.gain.setTargetAtTime(0, t0 + T.a, T.decay * Math.pow(261.6/f, .4));
+    else g.gain.setTargetAtTime(pk * T.sus, t0 + T.a, .1);
+    g.gain.setTargetAtTime(0, fim, T.rel/3);
+    oscs.forEach(o => { o.start(t0); o.stop(stop); });
+  }
+};
+
+/* ================= Estado ================= */
+const S = {gi:0, tok:0, sess:null, kbBase:60, timbre:'piano'};
+{ const a = Aluno.atual(); if (a) S.gi = a.gi || 0; }
+
+/* ================= Teclado ================= */
+const Teclado = {
+  lo:0, hi:0, keys:{},
+  montar(lo, hi){
+    if (lo === this.lo && hi === this.hi) return;
+    this.lo = lo; this.hi = hi; this.keys = {};
+    const kb = $('#kb'); kb.innerHTML = '';
+    const brancas = []; for (let m = lo; m <= hi; m++) if (!PRETAS.has(m%12)) brancas.push(m);
+    const W = brancas.length, bw = 62/W;
+    kb.style.minWidth = (W*26) + 'px';
+    for (let m = lo; m <= hi; m++){
+      const k = document.createElement('div'); k.dataset.m = m;
+      k.setAttribute('role','button'); k.setAttribute('aria-label', nomeNota(m));
+      if (PRETAS.has(m%12)){
+        const idx = brancas.indexOf(m-1);
+        k.className = 'key b'; k.style.left = ((idx+1)*100/W - bw/2) + '%'; k.style.width = bw + '%';
+      } else {
+        k.className = 'key w';
+        if (m%12 === 0) k.innerHTML = '<span class="nm">'+nomeNota(m)+'</span>';
+      }
+      k.addEventListener('pointerdown', ev => { ev.preventDefault(); tocarTecla(m); });
+      kb.appendChild(k); this.keys[m] = k;
+    }
+    $('#kbFaixa').textContent = 'Teclado · ' + nomeNota(lo) + ' a ' + nomeNota(hi);
+  },
+  marcar(m, cls, on = true){ const k = this.keys[m]; if (k) k.classList.toggle(cls, on); },
+  piscar(m, cls, ms){ this.marcar(m, cls); setTimeout(() => this.marcar(m, cls, false), ms); },
+  rotulo(m, txt){ const k = this.keys[m]; if (k){ if (txt) k.dataset.tag = txt; else delete k.dataset.tag; } },
+  limpar(){ Object.values(this.keys).forEach(k => { k.classList.remove('first','ok','bad','reveal','lit'); delete k.dataset.tag; }); },
+  centralizar(m){
+    const k = this.keys[m], sc = $('#kbScroll'); if (!k || sc.scrollWidth <= sc.clientWidth) return;
+    sc.scrollTo({left: k.offsetLeft - sc.clientWidth/2, behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth'});
+  }
+};
+
+function tocarTecla(m){
+  const s = S.sess;
+  const tk = s && s.q ? s.q.timbre : S.timbre;
+  Som.nota(m, .9, tk);
+  Teclado.piscar(m, 'down', 160);
+  if (s) Professor.responder(m);
+}
+
+/* ================= Professor (exemplos e exercícios) ================= */
+const Professor = {
+  gerar(semi, dir, ei){
+    const E = ETAPAS[ei];
+    for (let k = 0; k < 60; k++){
+      const pri = E.lo + Math.floor(Math.random() * 12 * E.oit);   // pri = random * oitava + base
+      const seg = dir === 'asc' ? pri + semi : pri - semi;
+      if (seg >= E.kbLo && seg <= E.kbHi && pri >= E.kbLo && pri <= E.kbHi) return {pri, seg, semi, dir};
+    }
+    return {pri:60, seg: dir === 'asc' ? 60+semi : 60-semi, semi, dir};
+  },
+  timbreDaQuestao(ei){
+    if (ETAPAS[ei].timbre === 'fixo') return 'piano';
+    const ks = Object.keys(TIMBRES); return ks[Math.floor(Math.random()*ks.length)];
+  },
+  escolher(semis, ultimo){
+    const st = (DB.stats[DB.atual] || {});
+    const pesos = semis.map(s => {
+      const x = st[s]; let p = (!x || x.t < 3) ? 1 : 1 + 2*(1 - x.h1/x.t);
+      if (semis.length > 1 && ultimo && ultimo.length === 2 && ultimo[0] === s && ultimo[1] === s) p = 0;
+      return p;
+    });
+    let r = Math.random() * pesos.reduce((a,b)=>a+b, 0);
+    for (let i = 0; i < semis.length; i++){ r -= pesos[i]; if (r <= 0) return semis[i]; }
+    return semis[semis.length-1];
+  },
+  async tocarIntervalo(q, tok, mostrar){
+    Teclado.limpar(); Teclado.marcar(q.pri, 'first'); Teclado.centralizar(q.pri);
+    if (mostrar) Teclado.rotulo(q.pri, nomeNota(q.pri));
+    Som.nota(q.pri, 1.0, q.timbre);
+    await wait(1000); if (tok !== S.tok) return false;
+    Som.nota(q.seg, 1.8, q.timbre);
+    if (mostrar){ Teclado.marcar(q.seg, 'lit'); Teclado.rotulo(q.seg, nomeNota(q.seg)); }
+    await wait(1900); return tok === S.tok;
+  },
+
+  async exemplo(){
+    if (S.sess) return;
+    Som.init();
+    const tok = ++S.tok, info = modInfo(S.gi), m = info.m;
+    const semis = Object.keys(m.iv).map(Number);
+    const dirs = m.fases.length === 1 ? ['asc','desc'] : m.fases.filter(f => f !== 'alt');
+    const reps = semis.length > 4 ? 1 : 2;
+    const tk = info.e.timbre === 'fixo' ? 'piano' : S.timbre;
+    UI.modoExemplo(true);
+    const fila = [];
+    dirs.forEach(d => semis.forEach(s => { for (let r = 0; r < reps; r++) fila.push([s,d]); }));
+    if (semis.length <= 4) semis.forEach(s => fila.push([s, Math.random() < .5 ? 'asc' : 'desc']));
+    for (let i = 0; i < fila.length; i++){
+      const [s, d] = fila[i], q = Object.assign(this.gerar(s, d, info.ei), {timbre: tk});
+      UI.lcd({titulo: m.iv[s] + ' ' + SETA[d], sub:[tons(s), nomeNota(q.pri) + ' → ' + nomeNota(q.seg), 'Exemplo ' + (i+1) + '/' + fila.length], prog:(i+1)/fila.length, msg:'Ouça e observe as teclas.'});
+      if (!await this.tocarIntervalo(q, tok, true)) return;
+      await wait(350); if (tok !== S.tok) return;
+    }
+    Teclado.limpar(); UI.modoExemplo(false);
+    UI.lcdOcioso('Exemplo concluído. Agora clique em “Iniciar exercício”.');
+  },
+
+  iniciar(){
+    if (!Aluno.atual()){ UI.abrirAluno('Cadastre-se para registrar seu desempenho. O exercício começa em seguida.', true); return; }
+    Som.init(); S.tok++;
+    const info = modInfo(S.gi), plano = [];
+    info.m.fases.forEach(f => { for (let i = 0; i < info.m.porFase; i++) plano.push(f); });
+    S.sess = {info, plano, idx:0, num:0, pts:0, a1:0, a2:0, erros:0, chance:1, q:null, aguardando:false, hist:[]};
+    $('#btnAvancar').hidden = true;
+    UI.modoExercicio(true);
+    this.proxima();
+  },
+  proxima(){
+    const s = S.sess; if (!s) return;
+    if (s.idx >= s.info.total) return this.finalizar();
+    const fase = s.plano[s.idx], semis = Object.keys(s.info.m.iv).map(Number);
+    const semi = this.escolher(semis, s.hist.slice(-2));
+    const dir = fase === 'alt' ? (Math.random() < .5 ? 'asc' : 'desc') : fase;
+    s.q = Object.assign(this.gerar(semi, dir, s.info.ei), {timbre: this.timbreDaQuestao(s.info.ei), fase});
+    s.hist.push(semi); s.num = s.idx + 1; s.chance = 1; s.aguardando = true;
+    UI.lcdExercicio('Ouça o intervalo e toque a 2ª nota.');
+    this.tocarQuestao();
+  },
+  tocarQuestao(){ const s = S.sess; if (s && s.q) this.tocarIntervalo(s.q, ++S.tok, false); },
+  responder(m){
+    const s = S.sess; if (!s || !s.aguardando) return;
+    const q = s.q, nome = s.info.m.iv[q.semi];
+    if (m === q.pri) return;
+    if (m === q.seg){
+      const ganho = s.chance === 1 ? 10 : 7;
+      s.pts += ganho; if (s.chance === 1) s.a1++; else s.a2++;
+      Desempenho.stat(DB.atual, q.semi, s.chance === 1, true);
+      s.aguardando = false; s.idx++;
+      Teclado.marcar(m, 'ok'); Teclado.rotulo(m, nomeNota(m));
+      UI.lcdExercicio('Correto! ' + nome + ' ' + SETA[q.dir] + ' · +' + ganho + ' pontos', 'ok');
+      setTimeout(() => { if (S.sess === s) this.proxima(); }, 1400);
+      return;
+    }
+    Teclado.piscar(m, 'bad', 650);
+    if (s.chance === 1){
+      s.chance = 2; s.aguardando = false;
+      UI.lcdExercicio('Não é essa nota (' + nomeNota(m) + '). Ouça de novo: 2ª chance.', 'bad');
+      setTimeout(() => { if (S.sess !== s) return; s.aguardando = true; this.tocarQuestao(); }, 800);
+    } else {
+      s.erros++; s.aguardando = false; s.idx++;
+      Desempenho.stat(DB.atual, q.semi, false, false);
+      UI.lcdExercicio('A nota era ' + nomeNota(q.seg) + ': ' + nome + ' ' + SETA[q.dir] + '. 0 pontos.', 'bad');
+      setTimeout(async () => {
+        if (S.sess !== s) return;
+        const tok = ++S.tok;
+        await this.tocarIntervalo(q, tok, true); if (S.sess !== s || tok !== S.tok) return;
+        Teclado.marcar(q.seg, 'reveal');
+        await wait(700); if (S.sess === s && tok === S.tok) this.proxima();
+      }, 700);
+    }
+  },
+  parar(){
+    S.tok++; const tinha = !!S.sess; S.sess = null;
+    Teclado.limpar(); UI.modoExercicio(false); UI.modoExemplo(false);
+    UI.lcdOcioso(tinha ? 'Exercício interrompido. Nada foi registrado.' : 'Parado.');
+  },
+  finalizar(){
+    const s = S.sess, i = s.info, aprovado = s.pts >= i.meta;
+    Desempenho.registrar({id:'d'+Date.now().toString(36), alunoId:DB.atual, gi:i.gi, pts:s.pts, max:i.max, meta:i.meta,
+      situacao: aprovado ? 'Aprovado' : 'Reprovado', data:new Date().toISOString(), total:i.total, a1:s.a1, a2:s.a2, erros:s.erros});
+    S.sess = null; S.tok++; UI.modoExercicio(false);
+    const prox = i.gi + 1;
+    UI.lcd({topo:'ETAPA ' + i.e.n + ' · MÓDULO ' + String(i.gi+1).padStart(2,'0') + '/40', pts:'PTS ' + s.pts + '/' + i.max,
+      titulo: aprovado ? 'Aprovado' : 'Abaixo da meta',
+      sub:['Acertos: ' + (s.a1+s.a2) + ' (' + s.a1 + ' na 1ª)', 'Erros: ' + s.erros, 'Meta: ' + i.meta],
+      prog:1, msg: aprovado ? (prox < 40 ? 'Módulo concluído. Você está apto ao módulo ' + (prox+1) + '.' : 'Você concluiu os 40 módulos do curso!') : 'Repita o módulo para atingir ' + i.meta + ' pontos.',
+      tipo: aprovado ? 'ok' : 'bad'});
+    const b = $('#btnAvancar');
+    if (aprovado && prox < 40){ b.hidden = false; b.textContent = 'Avançar para o módulo ' + (prox+1) + ' · ' + MODULOS[prox%10].t; b.onclick = () => { b.hidden = true; UI.selecionar(prox); }; }
+    else if (!aprovado){ b.hidden = false; b.textContent = 'Repetir módulo ' + (i.gi+1); b.onclick = () => { b.hidden = true; Professor.iniciar(); }; }
+    else b.hidden = true;
+    UI.mapa();
+  }
+};
+
+/* ================= Interface ================= */
+const UI = {
+  lcd({topo, pts, titulo, sub = [], prog = 0, msg = '', tipo = ''}){
+    if (topo !== undefined) $('#lcdTop').textContent = topo;
+    $('#lcdPts').textContent = pts || '';
+    $('#lcdTitle').textContent = titulo;
+    $('#lcdSub').innerHTML = sub.map(x => '<span>' + x + '</span>').join('');
+    $('#lcdProg').style.width = (prog*100) + '%';
+    const el = $('#lcdMsg'); el.textContent = msg; el.className = 'lcd-msg' + (tipo ? ' ' + tipo : '');
+  },
+  topo(i){ return 'ETAPA ' + i.e.n + ' · MÓDULO ' + String(i.gi+1).padStart(2,'0') + '/40'; },
+  lcdOcioso(msg){
+    const i = modInfo(S.gi);
+    this.lcd({topo:this.topo(i), pts:'META ' + i.meta + '/' + i.max, titulo:i.m.t,
+      sub:[i.m.fases.map(f => FASE_NOME[f].split(' ')[0]).join(' · '), i.total + ' questões', i.e.oit + ' oitavas', 'Timbre ' + i.e.timbre],
+      msg: msg || (Aluno.atual() ? 'Ouça o exemplo antes de iniciar o exercício.' : 'Cadastre o aluno para registrar o desempenho.')});
+  },
+  lcdExercicio(msg, tipo){
+    const s = S.sess; if (!s) return; const i = s.info, q = s.q;
+    const dots = '<span class="dots" title="Chances">' + [1,2].map(n => '<i class="' + (n >= s.chance ? 'on' : '') + '"></i>').join('') + '</span>';
+    this.lcd({topo:this.topo(i), pts:'PTS ' + s.pts + ' · META ' + i.meta, titulo:i.m.t,
+      sub:[FASE_NOME[q.fase] + (q.fase === 'alt' ? '' : ''), 'Questão ' + s.num + '/' + i.total, 'Timbre: ' + TIMBRES[q.timbre].nome + (i.e.timbre === 'fixo' ? ' (fixo)' : ''), dots],
+      prog:(s.idx)/i.total, msg, tipo});
+  },
+  modoExercicio(on){
+    $('#btnIniciar').disabled = on; $('#btnExemplo').disabled = on;
+    $('#btnRepetir').disabled = !on; $('#btnParar').disabled = !on;
+  },
+  modoExemplo(on){
+    $('#btnIniciar').disabled = on; $('#btnExemplo').disabled = on; $('#btnParar').disabled = !on;
+  },
+  selecionar(gi){
+    if (S.sess){ $('#lcdMsg').textContent = 'Pare o exercício para trocar de módulo.'; return; }
+    S.tok++; S.gi = gi; Aluno.guardarModulo(gi);
+    const e = ETAPAS[Math.floor(gi/10)]; Teclado.montar(e.kbLo, e.kbHi); Teclado.limpar();
+    UI.modoExemplo(false); $('#btnAvancar').hidden = true;
+    this.lcdOcioso(); this.mapa();
+  },
+  mapa(){
+    const id = DB.atual;
+    $('#mapa').innerHTML = ETAPAS.map((e, ei) => {
+      const cells = MODULOS.map((m, mi) => {
+        const gi = ei*10 + mi, st = id ? Desempenho.status(id, gi) : null;
+        return '<button type="button" class="cell' + (st ? ' ' + st : '') + (gi === S.gi ? ' cur' : '') + '" data-gi="' + gi + '" title="Módulo ' + (gi+1) + ': ' + m.t + '" aria-label="Módulo ' + (gi+1) + ', ' + m.t + '">' + (gi+1) + '</button>';
+      }).join('');
+      return '<div class="etapa-row"><div class="etapa-nome"><b>Etapa ' + e.n + '</b><span>' + e.oit + ' oitavas · timbre ' + e.timbre + '</span></div><div class="cells">' + cells + '</div></div>';
+    }).join('');
+    const i = modInfo(S.gi);
+    $('#modinfo').innerHTML = '<span><b>Módulo ' + (i.gi+1) + ' · ' + i.m.t + '.</b> ' + i.m.d + '</span><span>Intervalos: ' + Object.values(i.m.iv).join(', ') + '</span><span>Repetições: <b>' + i.total + '</b> · Mínimo para aprovação: <b>' + i.meta + '</b> de ' + i.max + ' pontos</span>';
+  },
+  aluno(){ const a = Aluno.atual(); $('#alunoNome').textContent = a ? a.nome : 'Entrar'; },
+  pendente:false,
+  abrirAluno(msg, iniciarDepois){
+    this.pendente = !!iniciarDepois;
+    $('#dlgMsg').textContent = msg || 'Escolha seu nome ou cadastre-se para registrar o desempenho.';
+    $('#dlgLista').innerHTML = DB.alunos.length ? DB.alunos.map(a => '<button type="button" data-id="' + a.id + '" class="' + (a.id === DB.atual ? 'sel' : '') + '">' + esc(a.nome) + '</button>').join('') : '';
+    $('#overlay').hidden = false; setTimeout(() => $('#novoNome').focus(), 30);
+  },
+  fecharAluno(){ $('#overlay').hidden = true; },
+  aposEscolherAluno(){
+    this.fecharAluno(); this.aluno(); S.verAluno = DB.atual;
+    Teclado.montar(ETAPAS[Math.floor(S.gi/10)].kbLo, ETAPAS[Math.floor(S.gi/10)].kbHi);
+    this.lcdOcioso(); this.mapa();
+    if (this.pendente){ this.pendente = false; Professor.iniciar(); }
+  }
+};
+function esc(s){ return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+
+/* ================= Desempenho (relatório) ================= */
+function renderDesempenho(){
+  const sel = $('#selAluno');
+  const id = S.verAluno || DB.atual || (DB.alunos[0] && DB.alunos[0].id);
+  sel.innerHTML = DB.alunos.length ? DB.alunos.map(a => '<option value="' + a.id + '"' + (a.id === id ? ' selected' : '') + '>' + esc(a.nome) + '</option>').join('') : '<option>Nenhum aluno cadastrado</option>';
+  sel.disabled = !DB.alunos.length; $('#btnApagar').disabled = !id;
+  const box = $('#desempConteudo');
+  if (!id){ box.innerHTML = '<div class="card empty">Nenhum aluno cadastrado ainda. Use o botão <b>Aluno</b> no topo para cadastrar e faça um exercício: o relatório aparece aqui.</div>'; return; }
+  const rs = Desempenho.doAluno(id), hoje = new Date().toLocaleDateString('pt-BR');
+  const tot = rs.reduce((a,r) => a + r.total, 0), ac = rs.reduce((a,r) => a + r.a1 + r.a2, 0), er = rs.reduce((a,r) => a + r.erros, 0);
+  const aprov = new Set(rs.filter(r => r.situacao === 'Aprovado').map(r => r.gi)).size;
+  const st = DB.stats[id] || {};
+  const linhas = Object.keys(NOME_SEMI).map(Number).filter(s => st[s] && st[s].t).map(s => ({s, t:st[s].t, p:st[s].h1/st[s].t, h:st[s].h}));
+  const elegiveis = linhas.filter(l => l.t >= 3), pior = elegiveis.length ? elegiveis.reduce((a,b) => b.p < a.p ? b : a) : null;
+  const bars = linhas.length ? linhas.map(l => '<div class="bar' + (pior && l.s === pior.s && l.p < 1 ? ' hard' : '') + '"><span>' + NOME_SEMI[l.s] + '</span><div class="track"><div class="fill" style="width:' + Math.round(l.p*100) + '%"></div></div><span class="n">' + Math.round(l.p*100) + '% · ' + l.t + '</span></div>').join('')
+    : '<p class="empty">Ainda sem respostas registradas.</p>';
+  const hist = rs.slice().reverse().map(r => {
+    const i = modInfo(r.gi), d = new Date(r.data);
+    return '<tr><td>' + d.toLocaleDateString('pt-BR') + ' ' + d.toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'}) + '</td><td>' + (r.gi+1) + ' · ' + i.m.t + ' <span class="hint" style="display:inline">(Etapa ' + i.e.n + ')</span></td><td class="num">' + r.pts + ' / ' + r.max + '</td><td class="num">' + r.meta + '</td><td class="num">' + (r.a1+r.a2) + '</td><td class="num">' + r.erros + '</td><td><span class="pill ' + (r.situacao === 'Aprovado' ? 'ok' : 'bad') + '">' + r.situacao + '</span></td></tr>';
+  }).join('');
+  const mini = ETAPAS.map((e, ei) => '<div class="etapa-row"><div class="etapa-nome"><b>Etapa ' + e.n + '</b></div><div class="cells">' + MODULOS.map((m, mi) => { const gi = ei*10+mi, s = Desempenho.status(id, gi); return '<span class="cell' + (s ? ' ' + s : '') + '" title="' + m.t + '">' + (gi+1) + '</span>'; }).join('') + '</div></div>').join('');
+  box.innerHTML =
+    '<div class="stack">' +
+    '<div class="stats">' +
+      '<div class="stat"><div class="label">Data</div><div class="v">' + hoje + '</div></div>' +
+      '<div class="stat"><div class="label">Total de intervalos</div><div class="v">' + tot + '</div></div>' +
+      '<div class="stat"><div class="label">Total de acertos</div><div class="v" style="color:var(--ok)">' + ac + '</div></div>' +
+      '<div class="stat"><div class="label">Total de erros</div><div class="v" style="color:var(--bad)">' + er + '</div></div>' +
+      '<div class="stat"><div class="label">Módulos aprovados</div><div class="v">' + aprov + '/40</div></div>' +
+    '</div>' +
+    '<div class="grid2">' +
+      '<div class="card"><div class="sec-head"><h2>Acerto na 1ª chance por intervalo</h2></div>' + (pior && pior.p < 1 ? '<p class="hint" style="margin-bottom:10px">Maior dificuldade: <b style="color:var(--bad)">' + NOME_SEMI[pior.s] + '</b>. Ele aparecerá com mais frequência nos próximos exercícios.</p>' : '') + '<div class="bars">' + bars + '</div></div>' +
+      '<div class="card"><div class="sec-head"><h2>Progresso no curso</h2></div><div class="mapa">' + mini + '</div></div>' +
+    '</div>' +
+    '<div class="card"><div class="sec-head"><h2>Histórico</h2><span class="hint">' + rs.length + ' execuções</span></div>' +
+      (rs.length ? '<div class="tbl-wrap"><table><thead><tr><th>Data</th><th>Módulo</th><th>Pontuação</th><th>Meta</th><th>Acertos</th><th>Erros</th><th>Situação</th></tr></thead><tbody>' + hist + '</tbody></table></div>' : '<p class="empty">Nenhum exercício concluído ainda.</p>') +
+    '</div></div>';
+}
+
+/* ================= Teoria (Quadro 1) ================= */
+function renderTeoria(){
+  const Q = [[1,'Dó – Réb','2ª menor','Dissonante'],[2,'Dó – Ré','2ª maior','Dissonante'],[3,'Dó – Ré# / Mib','2ª aumentada / 3ª menor','Dissonante / consonante perfeita'],
+    [4,'Dó – Mi','3ª maior','Consonante perfeita'],[5,'Dó – Fá','4ª justa','Consonante imperfeita'],[6,'Dó – Fá# / Solb','4ª aumentada / 5ª diminuta','Dissonante'],
+    [7,'Dó – Sol','5ª justa','Consonante imperfeita'],[8,'Dó – Sol# / Láb','5ª aumentada / 6ª menor','Dissonante / consonante perfeita'],[9,'Dó – Lá','6ª maior','Consonante perfeita'],
+    [10,'Dó – Sib','7ª menor','Dissonante'],[11,'Dó – Si','7ª maior','Dissonante'],[12,'Dó – Dó','8ª justa','Consonante imperfeita']];
+  $('#quadro1 tbody').innerHTML = Q.map(r => '<tr><td><button class="mini-btn" type="button" data-ouvir="' + r[0] + '" aria-label="Ouvir ' + r[2] + '">▶</button></td><td>' + r[1] + '</td><td>' + tons(r[0]) + '</td><td>' + r[2] + '</td><td>' + r[3] + '</td></tr>').join('');
+  $('#listaMod').innerHTML = MODULOS.map(m => '<li><b>' + m.t + '</b>: ' + Object.values(m.iv).join(', ') + (m.fases.length > 1 ? ' (asc., desc., alternado)' : ' (alternado)') + '</li>').join('');
+  $('#tbEtapas').innerHTML = ETAPAS.map((e, i) => '<tr><td>' + e.n + '</td><td>' + (i*10+1) + '–' + (i*10+10) + '</td><td>' + e.oit + '</td><td>' + e.timbre + '</td></tr>').join('');
+}
+
+/* ================= Eventos ================= */
+$('#timbre').innerHTML = Object.entries(TIMBRES).map(([k,t]) => '<option value="' + k + '">' + t.nome + '</option>').join('');
+$('#timbre').addEventListener('change', e => { S.timbre = e.target.value; });
+$('#volume').addEventListener('input', e => Som.volume(e.target.value/100));
+$('#btnExemplo').onclick = () => Professor.exemplo();
+$('#btnIniciar').onclick = () => Professor.iniciar();
+$('#btnRepetir').onclick = () => Professor.tocarQuestao();
+$('#btnParar').onclick = () => Professor.parar();
+$('#mapa').addEventListener('click', e => { const b = e.target.closest('[data-gi]'); if (b) UI.selecionar(+b.dataset.gi); });
+$('#alunoChip').onclick = () => UI.abrirAluno();
+$('#dlgFechar').onclick = () => { UI.pendente = false; UI.fecharAluno(); };
+$('#overlay').addEventListener('click', e => { if (e.target.id === 'overlay'){ UI.pendente = false; UI.fecharAluno(); } });
+$('#dlgLista').addEventListener('click', e => { const b = e.target.closest('[data-id]'); if (b){ Aluno.selecionar(b.dataset.id); UI.aposEscolherAluno(); } });
+$('#formAluno').addEventListener('submit', e => { e.preventDefault(); const a = Aluno.cadastrar($('#novoNome').value); if (a){ $('#novoNome').value = ''; Aluno.selecionar(a.id); UI.aposEscolherAluno(); } });
+$('#selAluno').addEventListener('change', e => { S.verAluno = e.target.value; renderDesempenho(); });
+$('#quadro1').addEventListener('click', e => { const b = e.target.closest('[data-ouvir]'); if (!b) return; const s = +b.dataset.ouvir; Som.nota(60, .9, S.timbre); setTimeout(() => Som.nota(60+s, 1.4, S.timbre), 900); });
+let apagarArmado = null;
+$('#btnApagar').onclick = () => {
+  const b = $('#btnApagar'), id = $('#selAluno').value;
+  if (!apagarArmado){ b.textContent = 'Confirmar: apagar tudo deste aluno'; apagarArmado = setTimeout(() => { b.textContent = 'Apagar histórico'; apagarArmado = null; }, 4000); return; }
+  clearTimeout(apagarArmado); apagarArmado = null; b.textContent = 'Apagar histórico';
+  DB.desempenho = DB.desempenho.filter(r => r.alunoId !== id); delete DB.stats[id]; salvar();
+  renderDesempenho(); UI.mapa();
+};
+document.querySelectorAll('.tabs [data-tab]').forEach(t => t.addEventListener('click', () => {
+  document.querySelectorAll('.tabs [data-tab]').forEach(x => x.setAttribute('aria-selected', x === t));
+  ['treino','desempenho','teoria','sobre'].forEach(n => { $('#tab-' + n).hidden = n !== t.dataset.tab; });
+  if (t.dataset.tab === 'desempenho') renderDesempenho();
+}));
+document.addEventListener('pointerdown', () => Som.init(), {once:true});
+
+/* teclado do computador */
+const MAPA_TECLAS = {a:0,w:1,s:2,e:3,d:4,f:5,t:6,g:7,y:8,h:9,u:10,j:11,k:12,o:13,l:14,p:15,'ç':16,';':16};
+const presas = new Set();
+document.addEventListener('keydown', e => {
+  if (e.target.closest('input,select,textarea') || e.metaKey || e.ctrlKey || e.altKey) return;
+  if (!$('#overlay').hidden || $('#tab-treino').hidden) return;
+  const k = e.key.toLowerCase();
+  if (k === 'z' || k === 'x'){ S.kbBase = Math.max(Teclado.lo, Math.min(Teclado.hi - 12, S.kbBase + (k === 'z' ? -12 : 12))); $('#kbBase').textContent = nomeNota(S.kbBase); return; }
+  if (k in MAPA_TECLAS && !presas.has(k)){
+    const m = S.kbBase + MAPA_TECLAS[k]; presas.add(k);
+    if (m >= Teclado.lo && m <= Teclado.hi){ Som.init(); tocarTecla(m); e.preventDefault(); }
+  }
+});
+document.addEventListener('keyup', e => presas.delete(e.key.toLowerCase()));
+
+/* ================= Início ================= */
+renderTeoria();
+UI.aluno();
+UI.selecionar(S.gi);
+</script>
+
+</body></html>
